@@ -46,7 +46,7 @@ namespace gr {
        * class. telescope::FrequencyWatcher::make is the public interface for
        * creating new instances.
        */
-      static sptr make(const std::string &rtlsdr_alias);
+      static sptr make(const std::string &rtlsdr_alias, double frequencyOffset);
     };
 
   } // namespace telescope

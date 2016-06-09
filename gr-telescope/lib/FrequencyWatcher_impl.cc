@@ -33,19 +33,20 @@ namespace gr
   {
 
     FrequencyWatcher::sptr
-    FrequencyWatcher::make(const std::string &rtlsdr_alias)
+    FrequencyWatcher::make(const std::string &rtlsdr_alias, double frequencyOffset)
     {
       return gnuradio::get_initial_sptr
-        (new FrequencyWatcher_impl(rtlsdr_alias));
+        (new FrequencyWatcher_impl(rtlsdr_alias, frequencyOffset));
     }
 
     /*
      * The private constructor
      */
-    FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &rtlsdr_alias)
+    FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &rtlsdr_alias, double _frequencyOffset)
       : gr::sync_block("FrequencyWatcher",
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
-              gr::io_signature::make(1, 1, sizeof(gr_complex))), numSamples(0), shouldIncrease(true)
+              gr::io_signature::make(1, 1, sizeof(gr_complex))),
+              numSamples(0), shouldIncrease(true), frequencyOffset(_frequencyOffset)
     {
       basic_block_sptr blockFromRegistry;
       //this might fail if we can't find the block in the registry
@@ -64,6 +65,21 @@ namespace gr
       {
         std::cerr << "RTLSDR source block pointer is invalid\n";
       }
+    }
+
+    void FrequencyWatcher_impl::setFrequency(double freq)
+    {
+      dRtlsdr->set_center_freq(freq + frequencyOffset);
+    }
+
+    double FrequencyWatcher_impl::getFrequency(void)
+    {
+      return dRtlsdr->get_center_freq() - frequencyOffset;
+    }
+
+    void FrequencyWatcher_impl::setAutoGain(bool automatic)
+    {
+      dRtlsdr->set_gain_mode(automatic);
     }
 
     /*
@@ -96,7 +112,7 @@ namespace gr
 
         shouldIncrease = !shouldIncrease;
         
-        dRtlsdr->set_center_freq(dRtlsdr->get_center_freq() + deltaFreq);
+        setFrequency(getFrequency() + deltaFreq);
       }
       ++numSamples;
 

@@ -32,13 +32,17 @@ namespace gr {
      private:
       int numSamples;
       bool shouldIncrease;
+      double frequencyOffset;
+      void setFrequency(double freq);
+      double getFrequency(void);
+      void setAutoGain(bool automatic);
 
      protected:
       int calculate_output_stream_length(const gr_vector_int &ninput_items);
       osmosdr::source::sptr dRtlsdr;
 
      public:
-      FrequencyWatcher_impl(const std::string &rtlsdr_alias);
+      FrequencyWatcher_impl(const std::string &rtlsdr_alias, double _frequencyOffset);
       ~FrequencyWatcher_impl();
 
       // Where all the action really happens
