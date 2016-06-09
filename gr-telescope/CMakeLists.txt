@@ -42,6 +42,8 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
     add_definitions(-fvisibility=hidden)
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 ########################################################################
 # Find boost
 ########################################################################
