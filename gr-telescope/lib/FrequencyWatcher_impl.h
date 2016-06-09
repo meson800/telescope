@@ -48,6 +48,11 @@ namespace gr {
       bool shouldIncrease;
 
       /*!
+       * If verbose output is enabled, commands are outputed to std::cerr
+       */
+      bool isVerbose;
+
+      /*!
        * Frequency offset set by the user.
        * This can be used to correct for a DC spike
        * when frequency is shifted down to 0 Hz
@@ -80,7 +85,7 @@ namespace gr {
       osmosdr::source::sptr dRtlsdr;
 
      public:
-      FrequencyWatcher_impl(const std::string &rtlsdr_alias, double _frequencyOffset);
+      FrequencyWatcher_impl(const std::string &rtlsdr_alias, double _frequencyOffset, bool _isVerbose);
       ~FrequencyWatcher_impl();
 
       // Where all the action really happens

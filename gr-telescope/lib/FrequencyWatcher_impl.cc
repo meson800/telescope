@@ -33,20 +33,20 @@ namespace gr
   {
 
     FrequencyWatcher::sptr
-    FrequencyWatcher::make(const std::string &rtlsdr_alias, double frequencyOffset)
+    FrequencyWatcher::make(const std::string &rtlsdr_alias, double frequencyOffset, bool isVerbose)
     {
       return gnuradio::get_initial_sptr
-        (new FrequencyWatcher_impl(rtlsdr_alias, frequencyOffset));
+        (new FrequencyWatcher_impl(rtlsdr_alias, frequencyOffset, isVerbose));
     }
 
     /*
      * The private constructor
      */
-    FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &rtlsdr_alias, double _frequencyOffset)
+    FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &rtlsdr_alias, double _frequencyOffset, bool _isVerbose)
       : gr::sync_block("FrequencyWatcher",
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex))),
-              numSamples(0), shouldIncrease(true), frequencyOffset(_frequencyOffset)
+              numSamples(0), shouldIncrease(true), frequencyOffset(_frequencyOffset), isVerbose(_isVerbose)
     {
       basic_block_sptr blockFromRegistry;
       //this might fail if we can't find the block in the registry
