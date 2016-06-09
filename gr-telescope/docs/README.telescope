@@ -1,0 +1,11 @@
+This is the telescope-write-a-block package meant as a guide to building
+out-of-tree packages. To use the telescope blocks, the Python namespaces
+is in 'telescope', which is imported as:
+
+    import telescope
+
+See the Doxygen documentation for details about the blocks available
+in this package. A quick listing of the details can be found in Python
+after importing by using:
+
+    help(telescope)
