@@ -30,7 +30,8 @@ namespace gr {
     class FrequencyWatcher_impl : public FrequencyWatcher
     {
      private:
-      // Nothing to declare in this block.
+      int numSamples;
+      bool shouldIncrease;
 
      protected:
       int calculate_output_stream_length(const gr_vector_int &ninput_items);

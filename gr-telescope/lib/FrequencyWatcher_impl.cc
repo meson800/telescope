@@ -45,7 +45,7 @@ namespace gr
     FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &rtlsdr_alias)
       : gr::sync_block("FrequencyWatcher",
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
-              gr::io_signature::make(1, 1, sizeof(gr_complex)))
+              gr::io_signature::make(1, 1, sizeof(gr_complex))), numSamples(0), shouldIncrease(true)
     {
       basic_block_sptr blockFromRegistry;
       //this might fail if we can't find the block in the registry
@@ -85,7 +85,20 @@ namespace gr
       {
         out[i] = in[i];
       }
-      // Do <+signal processing+>
+
+      if (numSamples > 2000)
+      {
+        numSamples = 0;
+        double deltaFreq = 100000;
+        if (!shouldIncrease)
+          deltaFreq *= -1;
+        std::cerr << (shouldIncrease? "In" : "De") << "creasing frequency\n";
+
+        shouldIncrease = !shouldIncrease;
+        
+        dRtlsdr->set_center_freq(dRtlsdr->get_center_freq() + deltaFreq);
+      }
+      ++numSamples;
 
       // Tell runtime system how many output items we produced.
       return noutput_items;
