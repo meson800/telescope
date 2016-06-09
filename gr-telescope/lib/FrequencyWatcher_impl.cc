@@ -74,7 +74,7 @@ namespace gr
 
     double FrequencyWatcher_impl::getFrequency(void)
     {
-      return dRtlsdr->get_center_freq() - frequencyOffset;
+      return (dRtlsdr->get_center_freq() - frequencyOffset);
     }
 
     void FrequencyWatcher_impl::setAutoGain(bool automatic)
