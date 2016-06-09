@@ -79,6 +79,11 @@ namespace gr {
       double frequencyOffset;
 
       /*!
+       * Stores the name of the RTLSDR block alias until start can be called
+       */
+      std::string rtlsdr_alias;
+
+      /*!
        * Changes the frequency our radio source is tuned to.
        * This transparently corrects using the frequency offset; just set what frequency is actually desired
        * Inserts a stream tag with the frequency change as soon as possible
@@ -104,7 +109,7 @@ namespace gr {
       osmosdr::source::sptr dRtlsdr;
 
      public:
-      FrequencyWatcher_impl(const std::string &rtlsdr_alias, const std::string &frequencyList,
+      FrequencyWatcher_impl(const std::string &_rtlsdr_alias, const std::string &frequencyList,
         double _frequencyOffset, bool _isVerbose);
       ~FrequencyWatcher_impl();
 
@@ -112,6 +117,12 @@ namespace gr {
       int work(int noutput_items,
            gr_vector_const_void_star &input_items,
            gr_vector_void_star &output_items);
+
+      /*!
+       * Override this function to do some initalization after everything else has been created
+       * This lets us get the radio source pointer no matter where it appears in the GRC script
+       */
+      bool start() override;
     };
 
   } // namespace telescope

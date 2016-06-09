@@ -45,12 +45,12 @@ namespace gr
     /*
      * The private constructor
      */
-    FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &rtlsdr_alias, const std::string &frequencyList,
+    FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &_rtlsdr_alias, const std::string &frequencyList,
       double _frequencyOffset, bool _isVerbose)
       : gr::sync_block("FrequencyWatcher",
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex))),
-              frequencyOffset(_frequencyOffset), 
+              frequencyOffset(_frequencyOffset), rtlsdr_alias(_rtlsdr_alias),
               isVerbose(_isVerbose), newFrequency(0), didChange(false)
     {
       //set up the frequency key
@@ -82,7 +82,12 @@ namespace gr
 
       }
 
-      //find the radio source block
+     
+    }
+
+    bool FrequencyWatcher_impl::start()
+    {
+       //find the radio source block
       basic_block_sptr blockFromRegistry;
       //this might fail if we can't find the block in the registry
       try
@@ -90,16 +95,26 @@ namespace gr
         blockFromRegistry = global_block_registry.block_lookup(pmt::intern(rtlsdr_alias));
         //try to convert it to our source block
         dRtlsdr = boost::dynamic_pointer_cast<osmosdr::source>(blockFromRegistry);
+
+        if (isVerbose)
+        {
+          std::cout << "Successfully found the RTLSDR source block\n";
+          return true;
+        }
       }
       catch (std::runtime_error)
       {
         std::cerr << "Cannot find the RTLSDR source block in the block registry\n";
+        return false;
       }
 
       if (!dRtlsdr)
       {
         std::cerr << "RTLSDR source block pointer is invalid\n";
+        return false;
       }
+
+      return false;
     }
 
     void FrequencyWatcher_impl::setFrequency(double freq)
