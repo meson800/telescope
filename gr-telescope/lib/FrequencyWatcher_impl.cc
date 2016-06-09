@@ -46,8 +46,13 @@ namespace gr
       : gr::sync_block("FrequencyWatcher",
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex))),
-              numSamples(0), shouldIncrease(true), frequencyOffset(_frequencyOffset), isVerbose(_isVerbose)
+              frequencyOffset(_frequencyOffset), 
+              isVerbose(_isVerbose), newFrequency(0), didChange(false)
     {
+      //set up the frequency key
+      freq_key = pmt::string_to_symbol("freq");
+
+      //find the radio source block
       basic_block_sptr blockFromRegistry;
       //this might fail if we can't find the block in the registry
       try
@@ -69,16 +74,40 @@ namespace gr
 
     void FrequencyWatcher_impl::setFrequency(double freq)
     {
+      if (!dRtlsdr)
+      {
+        std::cerr << "Can't set frequency: invalid RTLSDR source block pointer\n";
+        return;
+      }
+      if (isVerbose)
+        std::cout << "Setting frequency to " << freq << " Hz\n";
       dRtlsdr->set_center_freq(freq + frequencyOffset);
+
+      freqLock.lock();
+      newFrequency = freq;
+      didChange = true;
+      freqLock.unlock();
     }
 
     double FrequencyWatcher_impl::getFrequency(void)
     {
+      if (!dRtlsdr)
+      {
+        std::cerr << "Can't get frequency: invalid RTLSDR source block pointer\n";
+        return 0.0;
+      }
       return (dRtlsdr->get_center_freq() - frequencyOffset);
     }
 
     void FrequencyWatcher_impl::setAutoGain(bool automatic)
     {
+      if (!dRtlsdr)
+      {
+        std::cerr << "Can't set gain mode: invalid RTLSDR source block poiner\n";
+        return;
+      }
+      if (isVerbose)
+        std::cout << "Setting gain mode to " << (automatic? "automatic" : "fixed") << "\n";
       dRtlsdr->set_gain_mode(automatic);
     }
 
@@ -97,24 +126,21 @@ namespace gr
       const gr_complex *in = (const gr_complex *) input_items[0];
       gr_complex *out = (gr_complex *) output_items[0];
 
+      //check to see if we need to emit a tag
+      freqLock.lock();
+      if (didChange)
+      {
+        add_item_tag(0, nitems_written(0), freq_key, pmt::from_double(newFrequency));
+        didChange = false;
+      }
+      freqLock.unlock();
+
       for (int i = 0; i < noutput_items; ++i)
       {
         out[i] = in[i];
       }
 
-      if (numSamples > 2000)
-      {
-        numSamples = 0;
-        double deltaFreq = 100000;
-        if (!shouldIncrease)
-          deltaFreq *= -1;
-        std::cerr << (shouldIncrease? "In" : "De") << "creasing frequency\n";
 
-        shouldIncrease = !shouldIncrease;
-        
-        setFrequency(getFrequency() + deltaFreq);
-      }
-      ++numSamples;
 
       // Tell runtime system how many output items we produced.
       return noutput_items;

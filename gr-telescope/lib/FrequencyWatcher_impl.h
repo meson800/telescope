@@ -21,6 +21,8 @@
 #ifndef INCLUDED_TELESCOPE_FREQUENCYWATCHER_IMPL_H
 #define INCLUDED_TELESCOPE_FREQUENCYWATCHER_IMPL_H
 
+#include <mutex>
+
 #include <telescope/FrequencyWatcher.h>
 #include <osmosdr/source.h>
 
@@ -38,17 +40,28 @@ namespace gr {
     {
      private:
       /*!
-       * Temp variable for when we should change frequency
+       * Mutex to prevent race conditions if this gets a frequency change message while processing signals
        */
-      int numSamples;
+      std::mutex freqLock;
 
       /*!
-       * Temp boolean to tell if we should increase or decrease frequency
+       * Variable storing the key for our stream tag
        */
-      bool shouldIncrease;
+      pmt::pmt_t freq_key;
 
       /*!
-       * If verbose output is enabled, commands are outputed to std::cerr
+       * Variable that stores the frequency we jumped to.
+       * Protect access to this with a mutex
+       */
+      double newFrequency;
+
+      /*!
+       * Variable that lets us know  in the work function if we changed frequencies
+       */
+      bool didChange;
+
+      /*!
+       * If verbose output is enabled, commands are outputed to std::cout
        */
       bool isVerbose;
 
