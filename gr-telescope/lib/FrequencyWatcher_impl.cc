@@ -23,25 +23,29 @@
 #endif
 
 #include <gnuradio/io_signature.h>
+#include <gnuradio/block_registry.h>
+#include <pmt/pmt.h>
 #include "FrequencyWatcher_impl.h"
 
-namespace gr {
-  namespace telescope {
+namespace gr 
+{
+  namespace telescope 
+  {
 
     FrequencyWatcher::sptr
-    FrequencyWatcher::make()
+    FrequencyWatcher::make(const std::string &rtlsdr_alias)
     {
       return gnuradio::get_initial_sptr
-        (new FrequencyWatcher_impl());
+        (new FrequencyWatcher_impl(rtlsdr_alias));
     }
 
     /*
      * The private constructor
      */
-    FrequencyWatcher_impl::FrequencyWatcher_impl()
-      : gr::tagged_stream_block("FrequencyWatcher",
-              gr::io_signature::make(<+MIN_IN+>, <+MAX_IN+>, sizeof(<+ITYPE+>)),
-              gr::io_signature::make(<+MIN_OUT+>, <+MAX_OUT+>, sizeof(<+OTYPE+>)), <+len_tag_key+>)
+    FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &rtlsdr_alias)
+      : gr::sync_block("FrequencyWatcher",
+              gr::io_signature::make(1, 1, sizeof(gr_complex)),
+              gr::io_signature::make(1, 1, sizeof(gr_complex)))
     {}
 
     /*
@@ -52,21 +56,17 @@ namespace gr {
     }
 
     int
-    FrequencyWatcher_impl::calculate_output_stream_length(const gr_vector_int &ninput_items)
-    {
-      int noutput_items = /* <+set this+> */;
-      return noutput_items ;
-    }
-
-    int
     FrequencyWatcher_impl::work (int noutput_items,
-                       gr_vector_int &ninput_items,
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-      const <+ITYPE+> *in = (const <+ITYPE+> *) input_items[0];
-      <+OTYPE+> *out = (<+OTYPE+> *) output_items[0];
+      const gr_complex *in = (const gr_complex *) input_items[0];
+      gr_complex *out = (gr_complex *) output_items[0];
 
+      for (int i = 0; i < noutput_items; ++i)
+      {
+        out[i] = in[i];
+      }
       // Do <+signal processing+>
 
       // Tell runtime system how many output items we produced.

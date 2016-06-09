@@ -4,16 +4,16 @@
   <key>telescope_FrequencyWatcher</key>
   <category>telescope</category>
   <import>import telescope</import>
-  <make>telescope.FrequencyWatcher()</make>
+  <make>telescope.FrequencyWatcher($alias)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
        * key (makes the value accessible as $keyname, e.g. in the make node)
        * type -->
   <param>
-    <name>...</name>
-    <key>...</key>
-    <type>...</type>
+    <name>RTLSDR Block Alias</name>
+    <key>alias</key>
+    <type>string</type>
   </param>
 
   <!-- Make one 'sink' node per input. Sub-nodes:

@@ -23,7 +23,7 @@
 #define INCLUDED_TELESCOPE_FREQUENCYWATCHER_H
 
 #include <telescope/api.h>
-#include <gnuradio/tagged_stream_block.h>
+#include <gnuradio/sync_block.h>
 
 namespace gr {
   namespace telescope {
@@ -33,7 +33,7 @@ namespace gr {
      * \ingroup telescope
      *
      */
-    class TELESCOPE_API FrequencyWatcher : virtual public gr::tagged_stream_block
+    class TELESCOPE_API FrequencyWatcher : virtual public gr::sync_block
     {
      public:
       typedef boost::shared_ptr<FrequencyWatcher> sptr;
@@ -46,7 +46,7 @@ namespace gr {
        * class. telescope::FrequencyWatcher::make is the public interface for
        * creating new instances.
        */
-      static sptr make();
+      static sptr make(const std::string &rtlsdr_alias);
     };
 
   } // namespace telescope
