@@ -22,6 +22,7 @@
 #define INCLUDED_TELESCOPE_FREQUENCYWATCHER_IMPL_H
 
 #include <mutex>
+#include <vector>
 
 #include <telescope/FrequencyWatcher.h>
 #include <osmosdr/source.h>
@@ -48,6 +49,11 @@ namespace gr {
        * Variable storing the key for our stream tag
        */
       pmt::pmt_t freq_key;
+
+      /*!
+       * Stores a list of frequencies (doubles, in Hz) to watch
+       */
+      std::vector<double> frequencies;
 
       /*!
        * Variable that stores the frequency we jumped to.
@@ -98,7 +104,8 @@ namespace gr {
       osmosdr::source::sptr dRtlsdr;
 
      public:
-      FrequencyWatcher_impl(const std::string &rtlsdr_alias, double _frequencyOffset, bool _isVerbose);
+      FrequencyWatcher_impl(const std::string &rtlsdr_alias, const std::string &frequencyList,
+        double _frequencyOffset, bool _isVerbose);
       ~FrequencyWatcher_impl();
 
       // Where all the action really happens

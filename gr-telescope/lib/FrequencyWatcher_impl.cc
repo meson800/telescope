@@ -25,6 +25,8 @@
 #include <gnuradio/io_signature.h>
 #include <gnuradio/block_registry.h>
 #include <pmt/pmt.h>
+
+#include <sstream>
 #include "FrequencyWatcher_impl.h"
 
 namespace gr 
@@ -33,16 +35,18 @@ namespace gr
   {
 
     FrequencyWatcher::sptr
-    FrequencyWatcher::make(const std::string &rtlsdr_alias, double frequencyOffset, bool isVerbose)
+    FrequencyWatcher::make(const std::string &rtlsdr_alias, const std::string &frequencyList,
+      double frequencyOffset, bool isVerbose)
     {
       return gnuradio::get_initial_sptr
-        (new FrequencyWatcher_impl(rtlsdr_alias, frequencyOffset, isVerbose));
+        (new FrequencyWatcher_impl(rtlsdr_alias, frequencyList, frequencyOffset, isVerbose));
     }
 
     /*
      * The private constructor
      */
-    FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &rtlsdr_alias, double _frequencyOffset, bool _isVerbose)
+    FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &rtlsdr_alias, const std::string &frequencyList,
+      double _frequencyOffset, bool _isVerbose)
       : gr::sync_block("FrequencyWatcher",
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex))),
@@ -51,6 +55,32 @@ namespace gr
     {
       //set up the frequency key
       freq_key = pmt::string_to_symbol("freq");
+
+      std::istringstream ss(frequencyList);
+      double readDouble;
+
+      while (ss >> readDouble)
+      {
+        frequencies.push_back(readDouble);
+
+        if (ss.peek() == ',' || ss.peek() == ',')
+        {
+          ss.ignore();
+        }
+      }
+
+      if (isVerbose)
+      {
+        std::cout << "Read frequencies: ";
+        for (unsigned int i = 0; i < frequencies.size(); ++i)
+        {
+          std::cout << frequencies[i];
+          if (i != frequencies.size() - 1)
+            std::cout << ",";
+        }
+        std::cout << "\n";
+
+      }
 
       //find the radio source block
       basic_block_sptr blockFromRegistry;

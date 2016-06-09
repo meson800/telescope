@@ -4,7 +4,7 @@
   <key>telescope_FrequencyWatcher</key>
   <category>telescope</category>
   <import>import telescope</import>
-  <make>telescope.FrequencyWatcher($source_alias, $freq_offset, $is_verbose)</make>
+  <make>telescope.FrequencyWatcher($source_alias, $freqList,$freq_offset, $is_verbose)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
@@ -13,6 +13,12 @@
   <param>
     <name>RTLSDR Block Alias</name>
     <key>source_alias</key>
+    <type>string</type>
+  </param>
+
+  <param>
+    <name>Frequency Watch List</name>
+    <key>freqList</key>
     <type>string</type>
   </param>
 
