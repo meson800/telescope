@@ -22,6 +22,7 @@
 #define INCLUDED_TELESCOPE_FREQUENCYWATCHER_IMPL_H
 
 #include <telescope/FrequencyWatcher.h>
+#include <osmosdr/source.h>
 
 namespace gr {
   namespace telescope {
@@ -33,6 +34,7 @@ namespace gr {
 
      protected:
       int calculate_output_stream_length(const gr_vector_int &ninput_items);
+      osmosdr::source::sptr dRtlsdr;
 
      public:
       FrequencyWatcher_impl(const std::string &rtlsdr_alias);

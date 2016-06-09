@@ -46,7 +46,25 @@ namespace gr
       : gr::sync_block("FrequencyWatcher",
               gr::io_signature::make(1, 1, sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex)))
-    {}
+    {
+      basic_block_sptr blockFromRegistry;
+      //this might fail if we can't find the block in the registry
+      try
+      {
+        blockFromRegistry = global_block_registry.block_lookup(pmt::intern(rtlsdr_alias));
+        //try to convert it to our source block
+        dRtlsdr = boost::dynamic_pointer_cast<osmosdr::source>(blockFromRegistry);
+      }
+      catch (std::runtime_error)
+      {
+        std::cerr << "Cannot find the RTLSDR source block in the block registry\n";
+      }
+
+      if (!dRtlsdr)
+      {
+        std::cerr << "RTLSDR source block pointer is invalid\n";
+      }
+    }
 
     /*
      * Our virtual destructor.

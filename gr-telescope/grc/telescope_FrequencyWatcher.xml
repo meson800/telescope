@@ -4,7 +4,7 @@
   <key>telescope_FrequencyWatcher</key>
   <category>telescope</category>
   <import>import telescope</import>
-  <make>telescope.FrequencyWatcher($alias)</make>
+  <make>telescope.FrequencyWatcher($source_alias)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
@@ -12,7 +12,7 @@
        * type -->
   <param>
     <name>RTLSDR Block Alias</name>
-    <key>alias</key>
+    <key>source_alias</key>
     <type>string</type>
   </param>
 
@@ -23,7 +23,7 @@
        * optional (set to 1 for optional inputs) -->
   <sink>
     <name>in</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <type>complex</type>
   </sink>
 
   <!-- Make one 'source' node per output. Sub-nodes:
@@ -33,6 +33,6 @@
        * optional (set to 1 for optional inputs) -->
   <source>
     <name>out</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <type>complex</type>
   </source>
 </block>
