@@ -22,5 +22,6 @@
 ########################################################################
 install(FILES
     api.h
-    FrequencyWatcher.h DESTINATION include/telescope
+    FrequencyWatcher.h
+    NoiseSink.h DESTINATION include/telescope
 )

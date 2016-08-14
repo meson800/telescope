@@ -18,5 +18,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    telescope_FrequencyWatcher.xml DESTINATION share/gnuradio/grc/blocks
+    telescope_FrequencyWatcher.xml
+    telescope_NoiseSink.xml DESTINATION share/gnuradio/grc/blocks
 )

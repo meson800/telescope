@@ -27,6 +27,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND telescope_sources
     FrequencyWatcher_impl.cc
+    NoiseSink_impl.cc
 )
 
 set(telescope_sources "${telescope_sources}" PARENT_SCOPE)
@@ -74,6 +75,9 @@ target_link_libraries(
   ${Boost_LIBRARIES}
   ${CPPUNIT_LIBRARIES}
   gnuradio-telescope
+  noise
+  ssl
+  crypto
 )
 
 GR_ADD_TEST(test_telescope test-telescope)
