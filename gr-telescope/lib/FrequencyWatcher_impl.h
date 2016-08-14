@@ -62,7 +62,7 @@ namespace gr {
       double newFrequency;
 
       /*!
-       * Variable that lets us know  in the work function if we changed frequencies
+       * Variable that lets us know in the work function if we changed frequencies
        */
       bool didChange;
 
@@ -112,6 +112,12 @@ namespace gr {
       FrequencyWatcher_impl(const std::string &_rtlsdr_alias, const std::string &frequencyList,
         double _frequencyOffset, bool _isVerbose);
       ~FrequencyWatcher_impl();
+
+      /*!
+       * Message handler function for the input command port
+       * \param message A PMT representing the incoming message
+       */
+       void command_handler(pmt::pmt_t message);
 
       // Where all the action really happens
       int work(int noutput_items,

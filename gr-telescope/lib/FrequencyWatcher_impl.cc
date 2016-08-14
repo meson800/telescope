@@ -56,6 +56,10 @@ namespace gr
       //set up the frequency key
       freq_key = pmt::string_to_symbol("freq");
 
+      //and set up the message port
+      message_port_register_in(pmt::intern("FWCommands"));
+      boost::bind(&FrequencyWatcher_impl::command_handler, this, _1);
+
       std::istringstream ss(frequencyList);
       double readDouble;
 
@@ -115,6 +119,11 @@ namespace gr
       }
 
       return false;
+    }
+
+    void FrequencyWatcher_impl::command_handler(pmt::pmt_t message)
+    {
+
     }
 
     void FrequencyWatcher_impl::setFrequency(double freq)
