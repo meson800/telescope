@@ -23,7 +23,15 @@
 #endif
 
 #include <gnuradio/io_signature.h>
+#include <stdexcept>
 #include "NoiseSink_impl.h"
+
+#include <spawn.h>
+#include <unistd.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 namespace gr {
   namespace telescope {
@@ -41,16 +49,37 @@ namespace gr {
     NoiseSink_impl::NoiseSink_impl()
       : gr::sync_block("NoiseSink",
               gr::io_signature::make(1, 1, sizeof(float)),
-              gr::io_signature::make(0, 0, 0)),
-        noise(NoiseAPI::createNoiseInterface())
-    {}
+              gr::io_signature::make(0, 0, 0))
+    {
+        char * argv[] = {const_cast<char*>("noise_daemon"), NULL};
+        pid_t pid;
+        int status = posix_spawnp(&pid, "noise_daemon", NULL, NULL, argv, environ);
+        if (status != 0)
+        {
+                throw std::runtime_error("Couldn't start Noise daemon");
+        }
+        std::cout << "Started noise daemon with pid:" << pid << "\n";
+    }
+
+    bool
+    NoiseSink_impl::start()
+    {
+        //now init our output pipe
+        output_fd = open("noise_daemon_input", O_WRONLY);
+        if (output_fd == -1)
+        {
+                close(output_fd);
+                throw std::runtime_error("Couldn't open noise_daemon_input");
+        }
+    }
+
 
     /*
      * Our virtual destructor.
      */
     NoiseSink_impl::~NoiseSink_impl()
     {
-        NoiseAPI::destroyNoiseInterface(noise);
+            close(output_fd);
     }
 
     int

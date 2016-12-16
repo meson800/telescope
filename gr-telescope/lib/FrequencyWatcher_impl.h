@@ -79,6 +79,11 @@ namespace gr {
       double frequencyOffset;
 
       /*!
+       * Stores the file descriptor for input from noise daemon
+       */
+      int input_fd;
+
+      /*!
        * Stores the name of the RTLSDR block alias until start can be called
        */
       std::string rtlsdr_alias;

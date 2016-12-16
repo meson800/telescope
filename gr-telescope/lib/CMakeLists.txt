@@ -37,7 +37,7 @@ if(NOT telescope_sources)
 endif(NOT telescope_sources)
 
 add_library(gnuradio-telescope SHARED ${telescope_sources})
-target_link_libraries(gnuradio-telescope ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-telescope noise ssl crypto pthread ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
 set_target_properties(gnuradio-telescope PROPERTIES DEFINE_SYMBOL "gnuradio_telescope_EXPORTS")
 
 if(APPLE)
@@ -78,6 +78,7 @@ target_link_libraries(
   noise
   ssl
   crypto
+  pthread
 )
 
 GR_ADD_TEST(test_telescope test-telescope)

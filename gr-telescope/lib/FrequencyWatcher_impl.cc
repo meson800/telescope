@@ -29,6 +29,10 @@
 #include <sstream>
 #include "FrequencyWatcher_impl.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 namespace gr 
 {
   namespace telescope 
@@ -103,7 +107,18 @@ namespace gr
         if (isVerbose)
         {
           std::cout << "Successfully found the RTLSDR source block\n";
-          return true;
+        }
+
+        //connect into the noise daemon
+        input_fd = open("noise_daemon_output", O_RDONLY);
+        if (input_fd == -1)
+        {
+                close(input_fd);
+                throw std::runtime_error("Can't connect to noise_daemon_output");
+        }
+        if (isVerbose)
+        {
+                std::cout << "Successfully connected to the noise daemon";
         }
       }
       catch (std::runtime_error)
@@ -118,7 +133,7 @@ namespace gr
         return false;
       }
 
-      return false;
+      return true;
     }
 
     void FrequencyWatcher_impl::command_handler(pmt::pmt_t message)
@@ -170,6 +185,8 @@ namespace gr
      */
     FrequencyWatcher_impl::~FrequencyWatcher_impl()
     {
+            //destroy our fd
+            close(input_fd);
     }
 
     int

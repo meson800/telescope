@@ -30,7 +30,7 @@ namespace gr {
     class NoiseSink_impl : public NoiseSink
     {
      private:
-     NoiseInterface * noise;
+     int output_fd;
 
      public:
       NoiseSink_impl();
@@ -40,6 +40,12 @@ namespace gr {
       int work(int noutput_items,
          gr_vector_const_void_star &input_items,
          gr_vector_void_star &output_items);
+
+      /*!
+       * Override this function to do some initalization after everything else has been created
+       * This lets us get the radio source pointer no matter where it appears in the GRC script
+       */
+      bool start() override;
     };
 
   } // namespace telescope
