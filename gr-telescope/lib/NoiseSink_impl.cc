@@ -141,6 +141,7 @@ namespace gr {
       const float *in = (const float *) input_items[0];
 
       //get all the tags in this batch
+      uint64_t cur_index = 0;
       uint64_t start_sample = nitems_read(0);
       uint64_t end_sample = start_sample + static_cast<uint64_t>(noutput_items);
 
@@ -165,14 +166,45 @@ namespace gr {
                       is_timestamp_valid = true;
               } else if (pmt::eqv(((*tag_it).key), freq_key)) {
                       //set the last frequency seen so we can transfer it
+                      cur_freq = pmt::to_double((*tag_it).value);
+                      if (is_in_burst)
+                      {
+                              finalize_accumulator();
+                              init_accumulator(timestamp +
+                                (static_cast<double>((*tag_it).offset - timestamp_sample) / sample_rate)
+                                , cur_freq);
+                      }
               } else if (pmt::eqv(((*tag_it).key), burst_key)) {
                       if (pmt::is_true((*tag_it).value))
                       {
+                              if (!is_timestamp_valid)
+                              {
+                                      throw std::runtime_error("Started a burst before we have a valid timestamp");
+                              }
                               //yay! We started a burst
+                              //if we were already in a burst, finalize it
+                              if (is_in_burst)
+                              {
+                                      finalize_accumulator();
+                              }
                               is_in_burst = true;
+                              init_accumulator(timestamp +
+                                (static_cast<double>((*tag_it).offset - timestamp_sample) / sample_rate)
+                                , cur_freq);
+                              cur_index = (*tag_it).offset - start_sample;
                       } else {
+                              //add all samples from our last tagged point to now to get what we want
+                              uint64_t end_index = (*tag_it).offset - start_sample;
+                              add_bytes_to_accumulator(in + cur_index, end_index - cur_index);
+                              finalize_accumulator();
+                              is_in_burst = false;
                       }
               }
+      }
+      //we're done, so let's just add everything remaining
+      if (is_in_burst)
+      {
+              add_bytes_to_accumulator(in + cur_index, static_cast<uint64_t>(noutput_items) - cur_index);
       }
 
 
