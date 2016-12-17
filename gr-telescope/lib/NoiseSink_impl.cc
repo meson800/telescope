@@ -189,9 +189,12 @@ namespace gr {
                       timestamp = (double)num_secs + fractional_secs + time_offset;
                       timestamp_sample = offset; 
                       is_timestamp_valid = true;
+
+                      std::cout << "Found a timestamp\n";
               } else if (pmt::eqv(((*tag_it).key), freq_key)) {
                       //set the last frequency seen so we can transfer it
                       cur_freq = pmt::to_double((*tag_it).value);
+                      std::cout << "Changed frequency to " << cur_freq << "\n";
                       if (is_in_burst)
                       {
                               finalize_accumulator();
@@ -202,10 +205,13 @@ namespace gr {
               } else if (pmt::eqv(((*tag_it).key), burst_key)) {
                       if (pmt::is_true((*tag_it).value))
                       {
+                              /*
                               if (!is_timestamp_valid)
                               {
                                       throw std::runtime_error("Started a burst before we have a valid timestamp");
                               }
+                              */
+                              std::cout << "Started a burst\n";
                               //yay! We started a burst
                               //if we were already in a burst, finalize it
                               if (is_in_burst)
@@ -219,12 +225,14 @@ namespace gr {
                               cur_index = (*tag_it).offset - start_sample;
                       } else {
                               //add all samples from our last tagged point to now to get what we want
+                              std::cout << "Found the end of a burst\n";
                               uint64_t end_index = (*tag_it).offset - start_sample;
                               add_bytes_to_accumulator(in + cur_index, end_index - cur_index);
                               finalize_accumulator();
                               is_in_burst = false;
                       }
               }
+              ++tag_it;
       }
       //we're done, so let's just add everything remaining
       if (is_in_burst)
