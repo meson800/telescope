@@ -4,15 +4,27 @@
   <key>telescope_NoiseSink</key>
   <category>telescope</category>
   <import>import telescope</import>
-  <make>telescope.NoiseSink()</make>
+  <make>telescope.NoiseSink($stargazing_key, $sample_rate, $max_accum_samples)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
        * key (makes the value accessible as $keyname, e.g. in the make node)
        * type -->
   <param>
-    <name>Noise port</name>
-    <key>noise_port</key>
+    <name>Stargazing key</name>
+    <key>stargazing_key</key>
+    <type>string</type>
+  </param>
+
+  <param>
+    <name>Sample rate</name>
+    <key>sample_rate</key>
+    <type>real</type>
+  </param>
+
+  <param>
+    <name>Maximum Accumulator Samples</name>
+    <key>max_accum_samples</key>
     <type>int</type>
   </param>
 

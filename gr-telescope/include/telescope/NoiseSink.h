@@ -46,7 +46,7 @@ namespace gr {
        * class. telescope::NoiseSink::make is the public interface for
        * creating new instances.
        */
-      static sptr make();
+      static sptr make(const std::string & stargazing_key, double sample_rate, uint64_t max_accum_samples);
     };
 
   } // namespace telescope

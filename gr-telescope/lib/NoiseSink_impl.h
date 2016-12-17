@@ -30,10 +30,99 @@ namespace gr {
     class NoiseSink_impl : public NoiseSink
     {
      private:
-     int output_fd;
+     /*!
+      * Variable that stores our file descriptor for connection with the Noise daemon
+      */
+      int output_fd;
+
+     /*!
+      * Variable that stores the current frequency we've read
+      */
+      double cur_freq;
+
+     /*!
+      * Stores if we are currently reading a burst
+      */
+      bool is_in_burst;
+
+     /*!
+      * Stores the key for recognizing a time tag
+      */
+      pmt::pmt_t time_key;
+
+     /*!
+      * Stores the key for recognizing a burst tag
+      */
+      pmt::pmt_t burst_key;
+
+     /*!
+      * Stores the key for recognizing a frequency tag
+      */
+      pmt::pmt_t freq_key;
+
+     /*!
+      * Stores the sample rate that we are running at
+      * (This is used for timestamp)
+      */
+      double sample_rate;
+
+     /*!
+      * Stores the time value of a sample
+      */
+      double timestamp;
+
+     /*!
+      * Stores the sample number that matches with the timestamp
+      */
+      uint64_t timestamp_sample;
+
+     /*!
+      * Stores if we've seen a valid time tag yet. It's undefined if we don't
+      */
+      bool is_timestamp_valid;
+
+     /*!
+      * Stores the maximum size of the accumulator before it sends a message
+      */
+      uint64_t max_accum_size;
+
+     /*!
+      * Buffer that stores samples before sending it through noise
+      */
+      std::vector<float> accum;
+
+     /*!
+      * Stores the initial timestamp of the burst
+      */
+      double burst_timestamp;
+
+     /*!
+      * Stores the frequency of this burst
+      */
+      double burst_frequency;
+
+     /*!
+      * Inits the accumulator and clears it without sending a message if any bytes were in the accumulator
+      */
+      void init_accumulator(double _timestamp, double _frequency);
+
+     /*!
+      * Adds bytes to our accumulator, and sends a message through Noise if we have exceeded our message length
+      */
+      void add_bytes_to_accumulator(const float * arr, uint64_t num_samples);
+
+     /*!
+      * Finalizes the accumulator and sends a partial message if any bytes were in the accumulator
+      */
+      void finalize_accumulator();
+
+     /*!
+      * Sends the current state of the accumulator as a message through Noise
+      */
+      void send_accumulator();
 
      public:
-      NoiseSink_impl();
+      NoiseSink_impl(const std::string& stargazing_key_, double sample_rate_, uint64_t max_accum_samples_);
       ~NoiseSink_impl();
 
       // Where all the action really happens
