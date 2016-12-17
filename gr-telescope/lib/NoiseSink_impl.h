@@ -23,6 +23,7 @@
 
 #include <telescope/NoiseSink.h>
 #include <noise/NoiseAPI.h>
+#include <noise/Fingerprint.h>
 
 namespace gr {
   namespace telescope {
@@ -100,6 +101,11 @@ namespace gr {
       * Stores the frequency of this burst
       */
       double burst_frequency;
+
+     /*!
+      * Stores the fingerprint that we should send data to (the stargazing node)
+      */
+      Fingerprint dest_fingerprint;
 
      /*!
       * Inits the accumulator and clears it without sending a message if any bytes were in the accumulator

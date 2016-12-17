@@ -23,6 +23,7 @@
 #endif
 
 #include <gnuradio/io_signature.h>
+#include <noise/Helpers.h>
 #include <stdexcept>
 #include "NoiseSink_impl.h"
 
@@ -59,6 +60,7 @@ namespace gr {
       , timestamp_sample(0)
       , is_timestamp_valid(false)
       , max_accum_size(max_accum_samples_)
+      , dest_fingerprint(stargazing_key_)
     {
         char * argv[] = {const_cast<char*>("noise_daemon"), NULL};
         pid_t pid;
@@ -68,6 +70,9 @@ namespace gr {
                 throw std::runtime_error("Couldn't start Noise daemon");
         }
         std::cout << "Started noise daemon with pid:" << pid << "\n";
+
+        //reserve enough space in our accumulator
+        accum.reserve(max_accum_size);
     }
 
     bool
@@ -130,7 +135,27 @@ namespace gr {
     void
     NoiseSink_impl::send_accumulator()
     {
-            //TODO: implement
+        //write the destination fingerprint
+		std::vector<unsigned char> fingerprint_size = Helpers::uintToBytes(dest_fingerprint.data.size());
+		Helpers::writeToFd(output_fd, fingerprint_size);	
+		Helpers::writeToFd(output_fd, dest_fingerprint.data);
+
+        //write the message data
+		std::vector<unsigned char> message_size = Helpers::uintToBytes(accum.size() * 8);
+		Helpers::writeToFd(output_fd, message_size);
+        //do this part manually as we have 
+        uint64_t cur_index = 0;
+        uint64_t length = accum.size() * 8;
+        const unsigned char * buf = reinterpret_cast<unsigned char*>(accum.data());
+        while (cur_index < length)
+        {
+               int bytes_written = write(output_fd, buf + cur_index, length - cur_index); 
+                if (bytes_written == -1)
+                {
+                    throw std::runtime_error("Write threw an exception");
+                }
+                cur_index += bytes_written;
+        }
     }
 
     int
@@ -206,13 +231,6 @@ namespace gr {
       {
               add_bytes_to_accumulator(in + cur_index, static_cast<uint64_t>(noutput_items) - cur_index);
       }
-
-
-      
-
-      // Do <+signal processing+>
-
-      // Tell runtime system how many output items we produced.
       return noutput_items;
     }
 
