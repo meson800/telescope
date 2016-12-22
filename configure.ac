@@ -11,6 +11,25 @@ AC_CHECK_LIB(crypto, OPENSSL_config, , AC_MSG_ERROR([Cannot compile telescope wi
 AC_CHECK_LIB(pthread, pthread_create, , AC_MSG_ERROR([Cannot compile telescope without libpthread]))
 AC_CHECK_HEADER([fstream], , AC_MSG_ERROR([Cannot compile telescope without header "fstream"]))
 AC_CHECK_HEADER([iostream], , AC_MSG_ERROR([Cannot compile telescope without header "iostream"]))
+AM_OPTIONS_WXCONFIG
+reqwx=3.0.0
+AM_PATH_WXCONFIG($reqwx, wxWin=1)
+if test "$wxWin" != 1; then
+		AC_MSG_ERROR([
+				wxWidgets must be installed on your system.
+				 
+				 		Please check that wx-config is in path, the directory
+								where wxWidgets libraries are installed (returned by
+										'wx-config --libs' or 'wx-config --static --libs' command)
+										is in LD_LIBRARY_PATH or equivalent variable and
+												wxWidgets version is $reqwx or above.
+														])
+		fi
+		 
+CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
+CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"
+CFLAGS="$CFLAGS $WX_CFLAGS_ONLY"
+LIBS="$LIBS $WX_LIBS"
 AC_PROG_RANLIB
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

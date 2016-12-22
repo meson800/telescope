@@ -1,6 +1,3 @@
-#include <noise/NoiseAPI.h>
+#include "StargazerGUI.h"
 
-int main()
-{
-	return 0;
-}
+wxIMPLEMENT_APP(StargazerApp);
