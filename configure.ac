@@ -6,6 +6,7 @@ AC_LANG([C++])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11
 AC_CHECK_LIB(noise, libnoise_is_present, , AC_MSG_ERROR([Cannot compile telescope without libnoise. Try installing libnoise]))
+AC_CHECK_LIB(SDL2, SDL_OpenAudioDevice, , AC_MSG_ERROR([Cannot compile telescope stargazer without libsdl2. Try install libsdl2]))
 AC_CHECK_HEADER([fstream], , AC_MSG_ERROR([Cannot compile telescope without header "fstream"]))
 AC_CHECK_HEADER([iostream], , AC_MSG_ERROR([Cannot compile telescope without header "iostream"]))
 AM_OPTIONS_WXCONFIG

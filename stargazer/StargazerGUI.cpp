@@ -3,12 +3,18 @@
 #include <iostream>
 #include <sstream>
 
+#include <SDL2/SDL.h>
+
 StargazerApp::StargazerApp()
 	: guiFrame(nullptr)
-{}
+{
+	SDL_Init(SDL_INIT_AUDIO);
+}
+
 
 StargazerApp::~StargazerApp()
 {
+	SDL_Quit();
 }
 
 bool StargazerApp::OnInit()
@@ -22,6 +28,14 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
 	, hasStartedNoise(false)
 {
+	SDL_zero(wantedSpec);
+	wantedSpec.freq = 48000;
+	wantedSpec.format = AUDIO_F32;
+	wantedSpec.channels = 1;
+	wantedSpec.samples = 4096;
+	wantedSpec.callback = nullptr;
+	audioDevice = SDL_OpenAudioDevice(NULL, 0, &wantedSpec, &actualSpec, 0);
+	SDL_PauseAudioDevice(audioDevice, 0);
 	//init noise
 	
 	fileMenu = new wxMenu;
@@ -49,6 +63,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 MainFrame::~MainFrame()
 {
+	SDL_CloseAudioDevice(audioDevice);
 	if (hasStartedNoise)
 	{
 		noiseInter->writeKeysToFile();
@@ -131,6 +146,7 @@ void MainFrame::OnFingerprintEvent(FingerprintEvent & event)
 void MainFrame::OnMessageEvent(MessageEvent & event)
 {
 	std::cout << "Recieved Noise Message\n";
+	SDL_QueueAudio(audioDevice, event.message.message.data(), event.message.message.size());
 }
 
 void MainFrame::MessageRecieved(const Message& message)

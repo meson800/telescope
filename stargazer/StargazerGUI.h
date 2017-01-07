@@ -6,6 +6,8 @@
 #include <wx/wxprec.h>
 #include <wx/wx.h>
 
+#include <SDL2/SDL.h>
+
 #include <noise/NoiseCallbacks.h>
 #include <noise/NoiseAPI.h>
 #include <noise/NoiseInterface.h>
@@ -33,6 +35,10 @@ private:
 	void OnConnectionEvent(ConnectionEvent& event);
 	void OnFingerprintEvent(FingerprintEvent& event);
 	void OnMessageEvent(MessageEvent& event);
+
+	//sdl variables
+	SDL_AudioSpec wantedSpec, actualSpec;
+	SDL_AudioDeviceID audioDevice;
 
 	//private noise vars
 	NoiseInterface * noiseInter;
