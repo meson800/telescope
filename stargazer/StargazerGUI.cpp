@@ -55,6 +55,10 @@ MainFrame::~MainFrame()
 		noiseInter->stopNetworking();
 		noiseNetworkingThread.join();
 	}
+	for (auto it = connectedNodes.begin(); it != connectedNodes.end(); ++it)
+	{
+		delete it->second;
+	}
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)
@@ -89,14 +93,30 @@ void MainFrame::OnStartNoise(wxCommandEvent& event)
 
 void MainFrame::OnConnectionEvent(ConnectionEvent & event)
 {
-	std::cout << "Node " << event.system << (event.isConnected ? " connected" : " disconnected") << "\n";
 	if (event.isConnected)
 	{
-		NodeControl * newNode = new NodeControl(this, event.system);
+		NodeControl * newNode;
+		if (connectedNodes.count(event.system))
+		{
+			newNode = connectedNodes[event.system];
+		} else {
+			newNode = new NodeControl(this, event.system);
+			connectedNodes[event.system] = newNode;
+		}
 		connectionSizer->Add(newNode, wxSizerFlags(0).Left().Border(wxALL, 10));
 		connectionSizer->Layout();
-		connectedNodes[event.system] = newNode;
+		newNode->Show();
 	}
+	else
+	{
+		if (connectedNodes.count(event.system))
+		{
+			connectionSizer->Detach(connectedNodes[event.system]);
+			connectedNodes[event.system]->Hide();
+			connectionSizer->Layout();
+		}
+	}
+
 
 }
 
@@ -106,7 +126,6 @@ void MainFrame::OnFingerprintEvent(FingerprintEvent & event)
 	{
 		connectedNodes[event.system]->verifyFingerprint(event.fingerprint.toString());
 	}
-	std::cout << "Verfied node " << event.system << " as owning key " << event.fingerprint.toString() << "\n";
 }
 
 void MainFrame::OnMessageEvent(MessageEvent & event)
