@@ -28,6 +28,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	helpMenu = new wxMenu;
 
 	fileMenu->Append(wxID_NETWORK, "&Connect");
+	fileMenu->AppendSeparator();
 	fileMenu->Append(wxID_EXIT);
 	helpMenu->Append(wxID_ABOUT);
 
@@ -38,6 +39,12 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	SetMenuBar(topMenu);
 	CreateStatusBar();
 	SetStatusText("Noise has not been started");
+
+	//init the connection frame
+	connectionWindow = new wxWindow(this, wxID_ANY, wxPoint(0,0), wxSize(400, 100));
+	connectionSizer = new wxBoxSizer(wxHORIZONTAL);
+	connectionWindow->SetSizer(connectionSizer);
+	connectionWindow->Show();
 }
 
 MainFrame::~MainFrame()
@@ -74,20 +81,33 @@ void MainFrame::OnStartNoise(wxCommandEvent& event)
 	SetStatusText(status_builder.str().c_str());
 	noiseNetworkingThread = std::thread(&NoiseInterface::startNetworking, noiseInter, SERVER_PORT);
 
+	noiseInter->addCallbackClass(this);
+
 	hasStartedNoise = true;
 }
 
 
 void MainFrame::OnConnectionEvent(ConnectionEvent & event)
 {
+	std::cout << "Node " << event.system << (event.isConnected ? " connected" : " disconnected") << "\n";
+	if (event.isConnected)
+	{
+		NodeControl * newNode = new NodeControl(this, event.system);
+		connectionSizer->Add(newNode, wxSizerFlags(0).Left().Border(wxALL, 10));
+		connectionSizer->Layout();
+		connectedNodes[event.system] = newNode;
+	}
+
 }
 
 void MainFrame::OnFingerprintEvent(FingerprintEvent & event)
 {
+	std::cout << "Verfied node " << event.system << " as owning key " << event.fingerprint.toString() << "\n";
 }
 
 void MainFrame::OnMessageEvent(MessageEvent & event)
 {
+	std::cout << "Recieved Noise Message\n";
 }
 
 void MainFrame::MessageRecieved(const Message& message)

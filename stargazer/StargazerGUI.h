@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <map>
 
 #include <wx/wxprec.h>
 #include <wx/wx.h>
@@ -10,6 +11,7 @@
 #include <noise/NoiseInterface.h>
 
 #include "NoiseEvents.h"
+#include "NodeControl.h"
 
 class MainFrame : public wxFrame, public NoiseAPI::NoiseCallbacks
 {
@@ -36,6 +38,11 @@ private:
 	NoiseInterface * noiseInter;
 	std::thread noiseNetworkingThread;
 	bool hasStartedNoise;
+
+	//sizers for the connected node panel
+	wxWindow* connectionWindow;
+	wxBoxSizer* connectionSizer;
+	std::map<uint64_t, NodeControl *> connectedNodes;
 
 	wxMenu *fileMenu;
 	wxMenu *helpMenu;
