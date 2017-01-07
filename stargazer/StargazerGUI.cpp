@@ -102,6 +102,10 @@ void MainFrame::OnConnectionEvent(ConnectionEvent & event)
 
 void MainFrame::OnFingerprintEvent(FingerprintEvent & event)
 {
+	if (connectedNodes.count(event.system))
+	{
+		connectedNodes[event.system]->verifyFingerprint(event.fingerprint.toString());
+	}
 	std::cout << "Verfied node " << event.system << " as owning key " << event.fingerprint.toString() << "\n";
 }
 

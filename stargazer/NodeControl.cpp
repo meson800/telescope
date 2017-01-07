@@ -31,14 +31,15 @@ void NodeControl::paintNow()
 void NodeControl::render(wxDC& dc)
 {
 	dc.SetBrush((isVerified? *wxGREEN_BRUSH : *wxYELLOW_BRUSH));
-	dc.DrawCircle(0, 0, controlWidth);
+	dc.SetPen(wxNullPen);
+	dc.DrawCircle(controlWidth / 2, controlWidth / 2, (controlWidth / 2) - 2);
 }
 
 void NodeControl::verifyFingerprint(std::string fingerprint)
 {
 	verified_fingerprint = fingerprint;
 	std::stringstream tooltipBuilder;
-	tooltipBuilder << "System " << node << "\nFingerprint " << verified_fingerprint;
+	tooltipBuilder << "System " << node << "\nFingerprint:" << verified_fingerprint;
 	SetToolTip(tooltipBuilder.str().c_str());
 
 	isVerified = true;
