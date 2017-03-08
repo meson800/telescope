@@ -88,6 +88,12 @@ void MainFrame::OnAbout(wxCommandEvent& event)
 
 void MainFrame::OnStartNoise(wxCommandEvent& event)
 {
+	std::thread initThread(&MainFrame::StartNoise, this);
+	initThread.join();
+}
+
+void MainFrame::StartNoise()
+{
 	noiseInter = NoiseAPI::createNoiseInterface();
 	
 	noiseInter->loadKeysFromFile();
@@ -104,7 +110,6 @@ void MainFrame::OnStartNoise(wxCommandEvent& event)
 
 	hasStartedNoise = true;
 }
-
 
 void MainFrame::OnConnectionEvent(ConnectionEvent & event)
 {

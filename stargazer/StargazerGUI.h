@@ -36,6 +36,8 @@ private:
 	void OnFingerprintEvent(FingerprintEvent& event);
 	void OnMessageEvent(MessageEvent& event);
 
+	void StartNoise();
+
 	//sdl variables
 	SDL_AudioSpec wantedSpec, actualSpec;
 	SDL_AudioDeviceID audioDevice;
