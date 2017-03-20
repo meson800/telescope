@@ -52,13 +52,18 @@ namespace gr
     FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &_rtlsdr_alias, const std::string &frequencyList,
       double _frequencyOffset, bool _isVerbose)
       : gr::sync_block("FrequencyWatcher",
-              gr::io_signature::make(1, 1, sizeof(gr_complex)),
+              gr::io_signature::make2(2, 2, sizeof(gr_complex), sizeof(short)),
               gr::io_signature::make(1, 1, sizeof(gr_complex))),
               frequencyOffset(_frequencyOffset), rtlsdr_alias(_rtlsdr_alias),
-              isVerbose(_isVerbose), newFrequency(0), didChange(false)
+              isVerbose(_isVerbose), newFrequency(0), didChange(false), in_burst(false)
     {
       //set up the frequency key
       freq_key = pmt::string_to_symbol("freq");
+	
+      //set up the burst keys
+      burst_key = pmt::string_to_symbol("burst");
+      burst_false_value = pmt::PMT_F;
+      burst_true_value = pmt::PMT_T; 
 
       //and set up the message port
       message_port_register_in(pmt::intern("FWCommands"));
@@ -195,6 +200,7 @@ namespace gr
                        gr_vector_void_star &output_items)
     {
       const gr_complex *in = (const gr_complex *) input_items[0];
+      const short *trigger = (const short*)input_items[1];
       gr_complex *out = (gr_complex *) output_items[0];
 
       //check to see if we need to emit a tag
@@ -206,12 +212,26 @@ namespace gr
       }
       freqLock.unlock();
 
+      //pass all the output items through
+      memcpy(out, in, noutput_items);
+      
       for (int i = 0; i < noutput_items; ++i)
       {
-        out[i] = in[i];
-      }
-
-
+        if (trigger[i] > 0)
+        {
+                if (in_burst == false)
+                {
+                        in_burst = true;
+                        add_item_tag(0, nitems_written(0) + i, burst_key, burst_true_value);
+                }
+        } else {
+                if (in_burst == true)
+                {
+                        in_burst = false;
+                        add_item_tag(0, nitems_written(0) + i, burst_key, burst_false_value);
+                }
+        }
+      } 
 
       // Tell runtime system how many output items we produced.
       return noutput_items;

@@ -89,6 +89,18 @@ namespace gr {
       std::string rtlsdr_alias;
 
       /*!
+       * Stores the keys that we use for implementing the burst tag part of Frequency watcher
+       */
+      pmt::pmt_t burst_key;
+      pmt::pmt_t burst_false_value;
+      pmt::pmt_t burst_true_value;
+      
+      /*!
+       * Stores the current state, if we are currently in a burst
+       */
+      bool in_burst;
+
+      /*!
        * Changes the frequency our radio source is tuned to.
        * This transparently corrects using the frequency offset; just set what frequency is actually desired
        * Inserts a stream tag with the frequency change as soon as possible
