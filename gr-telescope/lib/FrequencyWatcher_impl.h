@@ -23,6 +23,7 @@
 
 #include <mutex>
 #include <vector>
+#include <chrono>
 
 #include <telescope/FrequencyWatcher.h>
 #include <osmosdr/source.h>
@@ -54,6 +55,12 @@ namespace gr {
        * Stores a list of frequencies (doubles, in Hz) to watch
        */
       std::vector<double> frequencies;
+      
+      /*!
+       * Stores an iterator to the current frequency we're on
+       * Used to iterate through frequencies, switching between them
+       */
+      std::vector<double>::iterator freqIt;
 
       /*!
        * Variable that stores the frequency we jumped to.
@@ -65,6 +72,16 @@ namespace gr {
        * Variable that lets us know in the work function if we changed frequencies
        */
       bool didChange;
+
+      /*!
+       * Variable that stores the last time step on which we changed frequency
+       */
+      std::chrono::time_point<std::chrono::steady_clock> lastFreqChangeTime;
+
+      /*!
+       * Stores how often we should switch frequencies
+       */
+      std::chrono::milliseconds changeFreqDuration;
 
       /*!
        * If verbose output is enabled, commands are outputed to std::cout
@@ -127,7 +144,7 @@ namespace gr {
 
      public:
       FrequencyWatcher_impl(const std::string &_rtlsdr_alias, const std::string &frequencyList,
-        double _frequencyOffset, bool _isVerbose);
+        uint32_t switchFreqDuration, double _frequencyOffset, bool _isVerbose);
       ~FrequencyWatcher_impl();
 
       /*!

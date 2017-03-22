@@ -23,6 +23,12 @@
   </param>
 
   <param>
+    <name>Channel Scan Time (ms)</name>
+    <key>freq_switch_delay</key>
+    <type>int</type>
+  </param>
+
+  <param>
     <name>Frequency Offset</name>
     <key>freq_offset</key>
     <type>real</type>

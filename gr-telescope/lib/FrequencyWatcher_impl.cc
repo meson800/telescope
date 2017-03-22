@@ -40,21 +40,22 @@ namespace gr
 
     FrequencyWatcher::sptr
     FrequencyWatcher::make(const std::string &rtlsdr_alias, const std::string &frequencyList,
-      double frequencyOffset, bool isVerbose)
+      uint32_t freqSwitchDuration, double frequencyOffset, bool isVerbose)
     {
       return gnuradio::get_initial_sptr
-        (new FrequencyWatcher_impl(rtlsdr_alias, frequencyList, frequencyOffset, isVerbose));
+        (new FrequencyWatcher_impl(rtlsdr_alias, frequencyList, freqSwitchDuration, frequencyOffset, isVerbose));
     }
 
     /*
      * The private constructor
      */
     FrequencyWatcher_impl::FrequencyWatcher_impl(const std::string &_rtlsdr_alias, const std::string &frequencyList,
-      double _frequencyOffset, bool _isVerbose)
+      uint32_t freqSwitchDuration, double _frequencyOffset, bool _isVerbose)
       : gr::sync_block("FrequencyWatcher",
               gr::io_signature::make2(2, 2, sizeof(gr_complex), sizeof(short)),
               gr::io_signature::make(1, 1, sizeof(gr_complex))),
               frequencyOffset(_frequencyOffset), rtlsdr_alias(_rtlsdr_alias),
+              changeFreqDuration(std::chrono::milliseconds(freqSwitchDuration)),
               isVerbose(_isVerbose), newFrequency(0), didChange(false), in_burst(false)
     {
       //set up the frequency key
@@ -81,6 +82,7 @@ namespace gr
           ss.ignore();
         }
       }
+      freqIt = frequencies.begin();
 
       if (isVerbose)
       {
@@ -203,8 +205,21 @@ namespace gr
       const short *trigger = (const short*)input_items[1];
       gr_complex *out = (gr_complex *) output_items[0];
 
-      //check to see if we need to emit a tag
+      //check if we need to change frequency.      
       freqLock.lock();
+      auto current_time = std::chrono::steady_clock::now();
+      if (current_time - lastFreqChangeTime > changeFreqDuration)
+      {
+            lastFreqChangeTime = current_time;
+            setFrequency(*freqIt);
+            
+            if (++freqIt == frequencies.end())
+            {
+                  freqIt = frequencies.begin();
+            }
+      }
+
+      //check to see if we need to emit a tag
       if (didChange)
       {
         add_item_tag(0, nitems_written(0), freq_key, pmt::from_double(newFrequency));
