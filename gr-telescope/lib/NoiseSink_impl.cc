@@ -141,11 +141,11 @@ namespace gr {
 		Helpers::writeToFd(output_fd, dest_fingerprint.data);
 
         //write the message data
-		std::vector<unsigned char> message_size = Helpers::uintToBytes(accum.size() * 8);
+		std::vector<unsigned char> message_size = Helpers::uintToBytes(accum.size() * sizeof(float));
 		Helpers::writeToFd(output_fd, message_size);
         //do this part manually as we have 
         uint64_t cur_index = 0;
-        uint64_t length = accum.size() * 8;
+        uint64_t length = accum.size() * sizeof(float);
         const unsigned char * buf = reinterpret_cast<unsigned char*>(accum.data());
         while (cur_index < length)
         {

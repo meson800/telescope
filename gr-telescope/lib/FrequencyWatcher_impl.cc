@@ -213,7 +213,7 @@ namespace gr
       freqLock.unlock();
 
       //pass all the output items through
-      memcpy(out, in, noutput_items);
+      memcpy(out, in, noutput_items * sizeof(gr_complex));
       
       for (int i = 0; i < noutput_items; ++i)
       {
