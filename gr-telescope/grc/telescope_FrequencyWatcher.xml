@@ -4,7 +4,7 @@
   <key>telescope_FrequencyWatcher</key>
   <category>telescope</category>
   <import>import telescope</import>
-  <make>telescope.FrequencyWatcher($source_alias, $freqList,$freq_offset, $is_verbose)</make>
+  <make>telescope.FrequencyWatcher($source_alias, $freqList, $freq_switch_delay, $freq_offset, $is_verbose)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
