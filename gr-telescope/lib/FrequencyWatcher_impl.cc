@@ -208,7 +208,7 @@ namespace gr
       //check if we need to change frequency.      
       freqLock.lock();
       auto current_time = std::chrono::steady_clock::now();
-      if (current_time - lastFreqChangeTime > changeFreqDuration)
+      if (!in_burst && current_time - lastFreqChangeTime > changeFreqDuration)
       {
             lastFreqChangeTime = current_time;
             setFrequency(*freqIt);
