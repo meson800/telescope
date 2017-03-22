@@ -211,7 +211,10 @@ namespace gr
       if (!in_burst && current_time - lastFreqChangeTime > changeFreqDuration)
       {
             lastFreqChangeTime = current_time;
-            setFrequency(*freqIt);
+            double newFreq = *freqIt;
+            freqLock.unlock();
+            setFrequency(newFreq);
+            freqLock.lock();
             
             if (++freqIt == frequencies.end())
             {
