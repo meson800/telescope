@@ -145,6 +145,10 @@ namespace gr {
 	Helpers::writeToFd(output_fd, fingerprint_size);	
 	Helpers::writeToFd(output_fd, dest_fingerprint.data);
 
+        //write the message data
+	std::vector<unsigned char> message_size = Helpers::uintToBytes(accum.size() * sizeof(float) + 12);
+	Helpers::writeToFd(output_fd, message_size);
+
         //write the initial timestamp info, the frequency, and the sub-burst number
 	std::vector<unsigned char> timestamp = Helpers::uintToBytes(burst_timestamp);
 	std::vector<unsigned char> freq = Helpers::uintToBytes(burst_frequency);
@@ -154,9 +158,6 @@ namespace gr {
 	Helpers::writeToFd(output_fd, sub_burst_id);
 	
 
-        //write the message data
-	std::vector<unsigned char> message_size = Helpers::uintToBytes(accum.size() * sizeof(float));
-	Helpers::writeToFd(output_fd, message_size);
 
         //do this part manually as we have 
         uint64_t cur_index = 0;
