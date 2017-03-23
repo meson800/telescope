@@ -25,7 +25,9 @@
 #include <gnuradio/io_signature.h>
 #include <noise/Helpers.h>
 #include <stdexcept>
+#include <chrono>
 #include "NoiseSink_impl.h"
+#include "TelescopeMessages.h"
 
 #include <spawn.h>
 #include <unistd.h>
@@ -99,8 +101,11 @@ namespace gr {
     void
     NoiseSink_impl::init_accumulator(double _timestamp, double _frequency)
     {
-            burst_timestamp = _timestamp;
+            std::chrono::time_point<std::chrono::system_clock> epoch_time;
+            auto time_since_epoch = std::chrono::system_clock::now() - epoch_time;
+            burst_timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(time_since_epoch).count();
             burst_frequency = _frequency;
+            burst_chunk_number = 0;
             accum.clear();
     }
 
@@ -136,13 +141,23 @@ namespace gr {
     NoiseSink_impl::send_accumulator()
     {
         //write the destination fingerprint
-		std::vector<unsigned char> fingerprint_size = Helpers::uintToBytes(dest_fingerprint.data.size());
-		Helpers::writeToFd(output_fd, fingerprint_size);	
-		Helpers::writeToFd(output_fd, dest_fingerprint.data);
+	std::vector<unsigned char> fingerprint_size = Helpers::uintToBytes(dest_fingerprint.data.size());
+	Helpers::writeToFd(output_fd, fingerprint_size);	
+	Helpers::writeToFd(output_fd, dest_fingerprint.data);
+
+        //write the initial timestamp info, the frequency, and the sub-burst number
+	std::vector<unsigned char> timestamp = Helpers::uintToBytes(burst_timestamp);
+	std::vector<unsigned char> freq = Helpers::uintToBytes(burst_frequency);
+	std::vector<unsigned char> sub_burst_id = Helpers::uintToBytes(burst_chunk_number);
+	Helpers::writeToFd(output_fd, timestamp);
+	Helpers::writeToFd(output_fd, freq);
+	Helpers::writeToFd(output_fd, sub_burst_id);
+	
 
         //write the message data
-		std::vector<unsigned char> message_size = Helpers::uintToBytes(accum.size() * sizeof(float));
-		Helpers::writeToFd(output_fd, message_size);
+	std::vector<unsigned char> message_size = Helpers::uintToBytes(accum.size() * sizeof(float));
+	Helpers::writeToFd(output_fd, message_size);
+
         //do this part manually as we have 
         uint64_t cur_index = 0;
         uint64_t length = accum.size() * sizeof(float);

@@ -5,6 +5,8 @@
 
 #include <SDL2/SDL.h>
 
+#include <noise/Helpers.h>
+
 StargazerApp::StargazerApp()
 	: guiFrame(nullptr)
 {
@@ -30,7 +32,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 {
 	SDL_zero(wantedSpec);
 	wantedSpec.freq = 48000;
-	wantedSpec.format = AUDIO_F32;
+	wantedSpec.format = AUDIO_F32LSB;
 	wantedSpec.channels = 1;
 	wantedSpec.samples = 4096;
 	wantedSpec.callback = nullptr;
@@ -150,8 +152,17 @@ void MainFrame::OnFingerprintEvent(FingerprintEvent & event)
 
 void MainFrame::OnMessageEvent(MessageEvent & event)
 {
-	std::cout << "Recieved Noise Message\n";
-	SDL_QueueAudio(audioDevice, event.message.message.data(), event.message.message.size());
+	//extract the information on timestamp, frequency, and chunk ID
+	const unsigned char* message_start = const_cast<const unsigned char*>(event.message.message.data());
+	uint64_t millis_since_epoch = Helpers::bytesToUINT(message_start);
+	
+	uint64_t freq = Helpers::bytesToUINT(message_start + 4);
+	uint64_t chunk_id = Helpers::bytesToUINT(message_start + 8);
+	std::cout << "Recieved Noise Message at timestamp " << millis_since_epoch <<
+		" and frequency " << freq << " Hz, chunk ID = " << chunk_id << "\n";
+
+	std::vector<unsigned char> audio_data = std::vector<unsigned char>(event.message.message.begin() + 12, event.message.message.end());
+	SDL_QueueAudio(audioDevice, audio_data.data(), audio_data.size());
 }
 
 void MainFrame::MessageRecieved(const Message& message)

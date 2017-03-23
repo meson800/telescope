@@ -95,12 +95,17 @@ namespace gr {
      /*!
       * Stores the initial timestamp of the burst
       */
-      double burst_timestamp;
+      uint64_t burst_timestamp;
+
+     /*!
+      * Stores the current sub-message number for this burst
+      */
+      uint32_t burst_chunk_number;
 
      /*!
       * Stores the frequency of this burst
       */
-      double burst_frequency;
+      uint32_t burst_frequency;
 
      /*!
       * Stores the fingerprint that we should send data to (the stargazing node)
