@@ -172,6 +172,9 @@ namespace gr {
                 }
                 cur_index += bytes_written;
         }
+
+	//increment our counter
+	++burst_chunk_number;
     }
 
     int
