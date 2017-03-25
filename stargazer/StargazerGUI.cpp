@@ -162,8 +162,7 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 	uint64_t chunk_id = Helpers::bytesToUINT(message_start + 12);
 
 	std::chrono::time_point<std::chrono::system_clock> timestamp =
-		std::chrono::time_point<std::chrono::system_clock>() +
-		std::chrono::milliseconds(millis_since_epoch);
+		std::chrono::system_clock::time_point(std::chrono::milliseconds(millis_since_epoch));
 	auto time_t_timestamp = std::chrono::system_clock::to_time_t(timestamp);
 
 	//because GCC is a pile of trash, we can't use std::put_time, because it's not implemented....

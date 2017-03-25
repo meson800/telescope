@@ -101,9 +101,7 @@ namespace gr {
     void
     NoiseSink_impl::init_accumulator(double _timestamp, double _frequency)
     {
-            std::chrono::time_point<std::chrono::system_clock> epoch_time;
-            auto time_since_epoch = std::chrono::system_clock::now() - epoch_time;
-            burst_timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(time_since_epoch).count();
+            burst_timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
             burst_frequency = _frequency;
             burst_chunk_number = 0;
             accum.clear();
