@@ -156,24 +156,24 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 {
 	//extract the information on timestamp, frequency, and chunk ID
 	const unsigned char* message_start = const_cast<const unsigned char*>(event.message.message.data());
-	uint64_t millis_since_epoch = Helpers::bytesToUINT(message_start);
+	uint64_t millis_since_epoch = Helpers::bytesToUINT64(message_start);
 	
-	uint64_t freq = Helpers::bytesToUINT(message_start + 4);
-	uint64_t chunk_id = Helpers::bytesToUINT(message_start + 8);
+	uint64_t freq = Helpers::bytesToUINT(message_start + 8);
+	uint64_t chunk_id = Helpers::bytesToUINT(message_start + 12);
 
 	std::chrono::time_point<std::chrono::system_clock> timestamp =
 		std::chrono::time_point<std::chrono::system_clock>() +
 		std::chrono::milliseconds(millis_since_epoch);
 	auto time_t_timestamp = std::chrono::system_clock::to_time_t(timestamp);
 
-	//because GCC is a pile of shit, we can't use std::put_time, because it's not implemented....fuckers
+	//because GCC is a pile of trash, we can't use std::put_time, because it's not implemented....
 	char timestamp_str [100];
 	strftime(timestamp_str, sizeof(timestamp_str), "%T %p", std::localtime(&time_t_timestamp));
 
 	std::cout << "Recieved Noise Message at timestamp "
 		<< timestamp_str << " and frequency " << freq << " Hz, chunk ID = " << chunk_id << "\n";
 
-	std::vector<unsigned char> audio_data = std::vector<unsigned char>(event.message.message.begin() + 12, event.message.message.end());
+	std::vector<unsigned char> audio_data = std::vector<unsigned char>(event.message.message.begin() + 16, event.message.message.end());
 	SDL_QueueAudio(audioDevice, audio_data.data(), audio_data.size());
 }
 
