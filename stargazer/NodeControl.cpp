@@ -6,7 +6,7 @@ wxBEGIN_EVENT_TABLE(NodeControl, wxWindow)
 	EVT_PAINT(NodeControl::paintEvent)
 wxEND_EVENT_TABLE()
 
-NodeControl::NodeControl(wxFrame* parent, uint64_t node_)
+NodeControl::NodeControl(wxWindow* parent, uint64_t node_)
 	: wxWindow(parent, wxID_ANY)
 	, node(node_)
 {

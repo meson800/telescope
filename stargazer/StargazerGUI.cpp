@@ -9,6 +9,8 @@
 
 #include <noise/Helpers.h>
 
+#include "AudioBlockControl.h"
+
 StargazerApp::StargazerApp()
 	: guiFrame(nullptr)
 {
@@ -58,11 +60,19 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	CreateStatusBar();
 	SetStatusText("Noise has not been started");
 
+	mainSizer = new wxBoxSizer(wxVERTICAL);
+	mainPanel = new wxPanel(this, -1);
+	mainPanel->SetSizer(mainSizer);	
+	mainPanel->Show();
+
 	//init the connection frame
-	connectionWindow = new wxWindow(this, wxID_ANY, wxPoint(0,0), wxSize(400, 100));
 	connectionSizer = new wxBoxSizer(wxHORIZONTAL);
-	connectionWindow->SetSizer(connectionSizer);
-	connectionWindow->Show();
+
+	mainSizer->Add(connectionSizer, wxSizerFlags(0).Right().Border(wxALL, 10));
+
+	//init the data frame
+	dataSizer = new wxBoxSizer(wxHORIZONTAL);
+	mainSizer->Add(dataSizer, wxSizerFlags(0).Left().Right().Expand().Border(wxALL, 10));
 }
 
 MainFrame::~MainFrame()
@@ -124,11 +134,12 @@ void MainFrame::OnConnectionEvent(ConnectionEvent & event)
 		{
 			newNode = connectedNodes[event.system];
 		} else {
-			newNode = new NodeControl(this, event.system);
+			newNode = new NodeControl(mainPanel, event.system);
 			connectedNodes[event.system] = newNode;
 		}
 		connectionSizer->Add(newNode, wxSizerFlags(0).Left().Border(wxALL, 10));
 		connectionSizer->Layout();
+		mainSizer->Layout();
 		newNode->Show();
 	}
 	else
@@ -138,6 +149,7 @@ void MainFrame::OnConnectionEvent(ConnectionEvent & event)
 			connectionSizer->Detach(connectedNodes[event.system]);
 			connectedNodes[event.system]->Hide();
 			connectionSizer->Layout();
+			mainSizer->Layout();
 		}
 	}
 
@@ -161,18 +173,43 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 	uint64_t freq = Helpers::bytesToUINT(message_start + 8);
 	uint64_t chunk_id = Helpers::bytesToUINT(message_start + 12);
 
+	std::cout << "Raw timestamp in millis is " << millis_since_epoch << "\n";
 	std::chrono::time_point<std::chrono::system_clock> timestamp =
 		std::chrono::system_clock::time_point(std::chrono::milliseconds(millis_since_epoch));
 	auto time_t_timestamp = std::chrono::system_clock::to_time_t(timestamp);
 
 	//because GCC is a pile of trash, we can't use std::put_time, because it's not implemented....
 	char timestamp_str [100];
-	strftime(timestamp_str, sizeof(timestamp_str), "%T %p", std::localtime(&time_t_timestamp));
+	strftime(timestamp_str, sizeof(timestamp_str), "%F %T %p", std::localtime(&time_t_timestamp));
 
 	std::cout << "Recieved Noise Message at timestamp "
 		<< timestamp_str << " and frequency " << freq << " Hz, chunk ID = " << chunk_id << "\n";
 
+	bool newAudioBlock = (recievedAudio[freq].count(millis_since_epoch) == 0);
 	std::vector<unsigned char> audio_data = std::vector<unsigned char>(event.message.message.begin() + 16, event.message.message.end());
+	//add to the recieved audio section
+	std::vector<unsigned char>& destVec = (recievedAudio[freq])[millis_since_epoch];
+	destVec.insert(destVec.end(), audio_data.begin(), audio_data.end());
+
+	//and create a new control for this recieved message
+	if (newAudioBlock)
+	{
+		AudioBlockControl * newControl = new AudioBlockControl(mainPanel, audioDevice,
+			recievedAudio[freq].find(millis_since_epoch));
+		(recievedAudioControls[freq])[millis_since_epoch] = newControl;
+		dataSizer->Add(newControl, wxSizerFlags(0).Left().Border(wxALL, 10));
+		dataSizer->Layout();
+		mainSizer->Layout();
+		newControl->Show();
+	} else {
+		//just update the width of the block
+		(recievedAudioControls[freq])[millis_since_epoch]->updateWidth();
+		(recievedAudioControls[freq])[millis_since_epoch]->Refresh();
+		dataSizer->Layout();
+		mainSizer->Layout();
+	}
+	
+	//and play the audio itself!
 	SDL_QueueAudio(audioDevice, audio_data.data(), audio_data.size());
 }
 

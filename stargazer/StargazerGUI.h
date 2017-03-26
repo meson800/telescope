@@ -15,6 +15,8 @@
 #include "NoiseEvents.h"
 #include "NodeControl.h"
 
+class AudioBlockControl;
+
 class MainFrame : public wxFrame, public NoiseAPI::NoiseCallbacks
 {
 public:
@@ -47,10 +49,23 @@ private:
 	std::thread noiseNetworkingThread;
 	bool hasStartedNoise;
 
+	//sizers for the whole display
+	wxBoxSizer* mainSizer;
+	wxPanel* mainPanel;
+
 	//sizers for the connected node panel
-	wxWindow* connectionWindow;
 	wxBoxSizer* connectionSizer;
 	std::map<uint64_t, NodeControl *> connectedNodes;
+
+	//sizers for the data panel
+	wxBoxSizer* dataSizer;
+	//Each frequency gets its own sizer
+	std::map<uint32_t, wxBoxSizer*> frequencySizers;
+
+	//map that stores audio blocks recieved
+	//the first key is frequency, the second is (raw) timestamp
+	std::map<uint32_t, std::map<uint64_t, AudioBlockControl*>> recievedAudioControls;
+	std::map<uint32_t, std::map<uint64_t, std::vector<unsigned char>>> recievedAudio;
 
 	wxMenu *fileMenu;
 	wxMenu *helpMenu;
