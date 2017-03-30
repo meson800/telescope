@@ -211,7 +211,7 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 			dataSizer->Layout();
 		}
 
-		AudioBlockControl * newControl = new AudioBlockControl(frequencyControls[freq], audioDevice,
+		AudioBlockControl * newControl = new AudioBlockControl(frequencyControls[freq]->blockPanel, audioDevice,
 			recievedAudio[freq].find(millis_since_epoch), millis_since_epoch);
 		(recievedAudioControls[freq])[millis_since_epoch] = newControl;
 		frequencyControls[freq]->addAudioBlock(newControl, millis_since_epoch);

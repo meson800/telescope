@@ -21,7 +21,11 @@ public:
 	//Tells this frequency control the timestamp bounds
 	void setTimestampBounds(uint64_t lower, uint64_t upper);
 
+	//the panel on which we place audio events
+	wxPanel * blockPanel;
+
 	wxDECLARE_EVENT_TABLE();
+
 
 private:
 	//whatever frequency we're using

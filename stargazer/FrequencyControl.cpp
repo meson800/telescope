@@ -5,6 +5,8 @@
 #include <sstream>
 #include <iostream>
 
+#include <wx/statline.h>
+
 wxBEGIN_EVENT_TABLE(FrequencyControl, wxPanel)
 wxEND_EVENT_TABLE()
 
@@ -27,7 +29,13 @@ FrequencyControl::FrequencyControl(wxPanel * parent, uint32_t freq_)
 	freqLabel = label_string.str();
 	
 	wxStaticText * label = new wxStaticText(this, wxID_ANY, freqLabel.c_str());
+	label->SetMinSize(wxSize(100, -1));
 	sizer->Add(label, wxSizerFlags(0).Left().Center().Border(wxALL, 10));
+
+	wxStaticLine * separator = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_VERTICAL);
+	sizer->Add(separator, wxSizerFlags(0).Left());
+	blockPanel = new wxPanel(this, wxID_ANY);
+	sizer->Add(blockPanel, wxSizerFlags(1).Expand());
 	sizer->Layout();
 }
 
@@ -48,9 +56,9 @@ void FrequencyControl::setTimestampBounds(uint64_t lower, uint64_t upper)
 
 void FrequencyControl::update(void)
 {
-	//get our current width and height
+	//get the current block panel width and height
 	int width, height;
-	GetSize(&width, &height);
+	blockPanel->GetSize(&width, &height);
 	//we can calculate a "timestamp difference", e.g. how wide the timestamp bounds are
 	int deltaTimestamp = static_cast<int>(upperTimestamp - lowerTimestamp);
 	//calculate a conversion factor
