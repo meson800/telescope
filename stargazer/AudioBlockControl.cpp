@@ -1,5 +1,7 @@
 #include "AudioBlockControl.h"
 
+#include "TelescopeGlobals.h"
+
 wxBEGIN_EVENT_TABLE(AudioBlockControl, wxWindow)
 	EVT_PAINT(AudioBlockControl::paintEvent)
 	EVT_LEFT_UP(AudioBlockControl::playAudio)
@@ -16,7 +18,7 @@ AudioBlockControl::AudioBlockControl(wxWindow* parent, SDL_AudioDeviceID audioDe
 
 void AudioBlockControl::updateWidth()
 {
-	width = audioData->second.size() / 4400;
+	width = audioData->second.size() / (AUDIO_RATE / 10);
 	SetMinSize(wxSize(width, controlHeight));
 }
 

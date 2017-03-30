@@ -12,6 +12,8 @@
 #include "AudioBlockControl.h"
 #include "FrequencyControl.h"
 
+#include "TelescopeGlobals.h"
+
 StargazerApp::StargazerApp()
 	: guiFrame(nullptr)
 {
@@ -36,7 +38,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	, hasStartedNoise(false)
 {
 	SDL_zero(wantedSpec);
-	wantedSpec.freq = 48000;
+	wantedSpec.freq = AUDIO_RATE;
 	wantedSpec.format = AUDIO_F32LSB;
 	wantedSpec.channels = 1;
 	wantedSpec.samples = 4096;
