@@ -37,8 +37,19 @@ void FrequencyControl::addAudioBlock(AudioBlockControl * control, uint64_t times
 	sizer->Layout();	
 }
 
+void FrequencyControl::setTimestampBounds(uint32_t lower, uint32_t upper)
+{
+	lowerTimestamp = lower;
+	upperTimestamp = upper;
+	update();
+}
+
 void FrequencyControl::update(void)
 {
+	//get our current width and height
+	int width, height;
+	GetSize(&width, &height);
+
 	for (auto it : audioBlockControls)
 	{
 		it->updateWidth();

@@ -17,6 +17,9 @@ public:
 	
 	//Re-lays out the box sizer, as needed (due to updates to the audio blocks)
 	void update(void);
+	
+	//Tells this frequency control the timestamp bounds
+	void setTimestampBounds(uint32_t lower, uint32_t upper);
 
 	wxDECLARE_EVENT_TABLE();
 
@@ -29,4 +32,7 @@ private:
 	wxBoxSizer * sizer;
 	
 	std::string freqLabel;
+
+	//stores the current timestamp bounds that we're displaying
+	uint32_t lowerTimestamp, upperTimestamp;
 };

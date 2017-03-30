@@ -12,10 +12,13 @@ class AudioBlockControl : public wxWindow
 
 	using AudioDataIterator = std::map<uint64_t, std::vector<unsigned char>>::iterator;
 public:
-	AudioBlockControl(wxWindow* parent, SDL_AudioDeviceID audioDevice_, AudioDataIterator rawData);
+	AudioBlockControl(wxWindow* parent, SDL_AudioDeviceID audioDevice_, AudioDataIterator rawData, uint64_t timestamp);
 
 	void paintEvent(wxPaintEvent & evt);
 	void paintNow();
+
+	uint64_t getLowerTimestamp(void);
+	uint64_t getUpperTimestamp(void);
 
 	void updateWidth();
 	void render(wxDC& dc);
@@ -25,6 +28,7 @@ public:
 
 private:
 	uint32_t width;
+	uint64_t lowerTimestamp;
 	SDL_AudioDeviceID audioDevice;
 	AudioDataIterator audioData;
 };
