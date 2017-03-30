@@ -69,12 +69,15 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//init the connection frame
 	connectionSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	mainSizer->Add(connectionSizer, wxSizerFlags(0).Right().Border(wxALL, 10));
+	mainSizer->Add(connectionSizer, wxSizerFlags(0).Right());
 
 	//init the data frame
+	dataPanel = new wxPanel(mainPanel, wxID_ANY);
+	dataPanel->SetBackgroundColour(wxColour(142, 142, 142));
 	dataSizer = new wxFlexGridSizer(1);
 	dataSizer->AddGrowableCol(0);
-	mainSizer->Add(dataSizer, wxSizerFlags(0).Left().Right().Expand().Border(wxALL, 10));
+	dataPanel->SetSizer(dataSizer);
+	mainSizer->Add(dataPanel, wxSizerFlags(1).Left().Right().Expand().Border(wxTOP, 10));
 }
 
 MainFrame::~MainFrame()
@@ -199,9 +202,9 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 		//see if we need to create a FrequencyControl to hold this
 		if (frequencyControls.count(freq) == 0)
 		{
-			FrequencyControl * newFreqControl = new FrequencyControl(mainPanel, freq);
+			FrequencyControl * newFreqControl = new FrequencyControl(dataPanel, freq);
 			frequencyControls[freq] = newFreqControl;
-			dataSizer->Add(newFreqControl, wxSizerFlags(0).Left().Expand().Border(wxALL, 10));
+			dataSizer->Add(newFreqControl, wxSizerFlags(0).Left().Expand().Border(wxALL, 5));
 			dataSizer->Layout();
 		}
 

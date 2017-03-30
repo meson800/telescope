@@ -59,6 +59,7 @@ private:
 	std::map<uint64_t, NodeControl *> connectedNodes;
 
 	//sizers for the data panel
+	wxPanel* dataPanel;
 	wxFlexGridSizer* dataSizer;
 	//Each frequency gets its own sizer
 	std::map<uint32_t, FrequencyControl *> frequencyControls;
