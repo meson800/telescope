@@ -16,6 +16,7 @@
 #include "NodeControl.h"
 
 class AudioBlockControl;
+class FrequencyControl;
 
 class MainFrame : public wxFrame, public NoiseAPI::NoiseCallbacks
 {
@@ -60,7 +61,7 @@ private:
 	//sizers for the data panel
 	wxBoxSizer* dataSizer;
 	//Each frequency gets its own sizer
-	std::map<uint32_t, wxBoxSizer*> frequencySizers;
+	std::map<uint32_t, FrequencyControl *> frequencyControls;
 
 	//map that stores audio blocks recieved
 	//the first key is frequency, the second is (raw) timestamp

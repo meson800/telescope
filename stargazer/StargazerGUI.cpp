@@ -10,6 +10,7 @@
 #include <noise/Helpers.h>
 
 #include "AudioBlockControl.h"
+#include "FrequencyControl.h"
 
 StargazerApp::StargazerApp()
 	: guiFrame(nullptr)
@@ -71,7 +72,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	mainSizer->Add(connectionSizer, wxSizerFlags(0).Right().Border(wxALL, 10));
 
 	//init the data frame
-	dataSizer = new wxBoxSizer(wxHORIZONTAL);
+	dataSizer = new wxBoxSizer(wxVERTICAL);
 	mainSizer->Add(dataSizer, wxSizerFlags(0).Left().Right().Expand().Border(wxALL, 10));
 }
 
@@ -194,10 +195,19 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 	//and create a new control for this recieved message
 	if (newAudioBlock)
 	{
-		AudioBlockControl * newControl = new AudioBlockControl(mainPanel, audioDevice,
+		//see if we need to create a FrequencyControl to hold this
+		if (frequencyControls.count(freq) == 0)
+		{
+			FrequencyControl * newFreqControl = new FrequencyControl(mainPanel, freq);
+			frequencyControls[freq] = newFreqControl;
+			dataSizer->Add(newFreqControl, wxSizerFlags(0).Left().Border(wxALL, 10));
+			dataSizer->Layout();
+		}
+
+		AudioBlockControl * newControl = new AudioBlockControl(frequencyControls[freq], audioDevice,
 			recievedAudio[freq].find(millis_since_epoch));
 		(recievedAudioControls[freq])[millis_since_epoch] = newControl;
-		dataSizer->Add(newControl, wxSizerFlags(0).Left().Border(wxALL, 10));
+		frequencyControls[freq]->addAudioBlock(newControl, millis_since_epoch);
 		dataSizer->Layout();
 		mainSizer->Layout();
 		newControl->Show();
@@ -205,6 +215,7 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 		//just update the width of the block
 		(recievedAudioControls[freq])[millis_since_epoch]->updateWidth();
 		(recievedAudioControls[freq])[millis_since_epoch]->Refresh();
+		frequencyControls[freq]->update();
 		dataSizer->Layout();
 		mainSizer->Layout();
 	}
