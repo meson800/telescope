@@ -4,13 +4,14 @@
 
 #include <sstream>
 
-wxBEGIN_EVENT_TABLE(FrequencyControl, wxWindow)
+wxBEGIN_EVENT_TABLE(FrequencyControl, wxPanel)
 wxEND_EVENT_TABLE()
 
-FrequencyControl::FrequencyControl(wxWindow * parent, uint32_t freq_)
-	: wxWindow(parent, wxID_ANY)
+FrequencyControl::FrequencyControl(wxPanel * parent, uint32_t freq_)
+	: wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | wxBORDER_SIMPLE)
 	, freq(freq_)
 {
+	this->SetBackgroundColour(wxColour(142, 142, 142));
 	sizer = new wxBoxSizer(wxHORIZONTAL); 	
 	this->SetSizer(sizer);
 

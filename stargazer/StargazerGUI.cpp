@@ -72,7 +72,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	mainSizer->Add(connectionSizer, wxSizerFlags(0).Right().Border(wxALL, 10));
 
 	//init the data frame
-	dataSizer = new wxBoxSizer(wxVERTICAL);
+	dataSizer = new wxFlexGridSizer(1);
+	dataSizer->AddGrowableCol(0);
 	mainSizer->Add(dataSizer, wxSizerFlags(0).Left().Right().Expand().Border(wxALL, 10));
 }
 
@@ -200,7 +201,7 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 		{
 			FrequencyControl * newFreqControl = new FrequencyControl(mainPanel, freq);
 			frequencyControls[freq] = newFreqControl;
-			dataSizer->Add(newFreqControl, wxSizerFlags(0).Left().Border(wxALL, 10));
+			dataSizer->Add(newFreqControl, wxSizerFlags(0).Left().Expand().Border(wxALL, 10));
 			dataSizer->Layout();
 		}
 

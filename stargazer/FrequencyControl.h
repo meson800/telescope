@@ -8,10 +8,10 @@
 //forward declarations
 class AudioBlockControl;
 
-class FrequencyControl : public wxWindow
+class FrequencyControl : public wxPanel
 {
 public:	
-	FrequencyControl(wxWindow* parent, uint32_t freq_);
+	FrequencyControl(wxPanel* parent, uint32_t freq_);
 	//Add another recieved audio block to this frequency control
 	void addAudioBlock(AudioBlockControl* control, uint64_t timestamp);
 	
