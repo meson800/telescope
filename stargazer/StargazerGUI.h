@@ -69,6 +69,11 @@ private:
 	std::map<uint32_t, std::map<uint64_t, AudioBlockControl*>> recievedAudioControls;
 	std::map<uint32_t, std::map<uint64_t, std::vector<unsigned char>>> recievedAudio;
 
+	//store the current lowest and largest timestamp values
+	uint64_t lowestTimestamp;
+	uint64_t highestTimestamp;
+	bool firstEventSeen;
+
 	wxMenu *fileMenu;
 	wxMenu *helpMenu;
 	wxMenuBar *topMenu;

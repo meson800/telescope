@@ -36,6 +36,7 @@ bool StargazerApp::OnInit()
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
 	, hasStartedNoise(false)
+	, firstEventSeen(false)
 {
 	SDL_zero(wantedSpec);
 	wantedSpec.freq = AUDIO_RATE;
@@ -219,11 +220,20 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 		newControl->Show();
 	} else {
 		//just update the width of the block
-		(recievedAudioControls[freq])[millis_since_epoch]->updateWidth();
-		(recievedAudioControls[freq])[millis_since_epoch]->Refresh();
 		frequencyControls[freq]->update();
 		dataSizer->Layout();
 		mainSizer->Layout();
+	}
+	
+	if (!firstEventSeen)
+	{
+		firstEventSeen = true;
+		lowestTimestamp = millis_since_epoch;
+	}
+	highestTimestamp = (recievedAudioControls[freq])[millis_since_epoch]->getUpperTimestamp();
+	for (auto it : frequencyControls)
+	{
+		it.second->setTimestampBounds(lowestTimestamp, highestTimestamp);
 	}
 	
 	//and play the audio itself!

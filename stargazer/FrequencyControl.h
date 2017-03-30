@@ -19,7 +19,7 @@ public:
 	void update(void);
 	
 	//Tells this frequency control the timestamp bounds
-	void setTimestampBounds(uint32_t lower, uint32_t upper);
+	void setTimestampBounds(uint64_t lower, uint64_t upper);
 
 	wxDECLARE_EVENT_TABLE();
 
@@ -34,5 +34,5 @@ private:
 	std::string freqLabel;
 
 	//stores the current timestamp bounds that we're displaying
-	uint32_t lowerTimestamp, upperTimestamp;
+	uint64_t lowerTimestamp, upperTimestamp;
 };

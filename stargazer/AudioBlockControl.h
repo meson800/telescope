@@ -20,14 +20,12 @@ public:
 	uint64_t getLowerTimestamp(void);
 	uint64_t getUpperTimestamp(void);
 
-	void updateWidth();
 	void render(wxDC& dc);
 	void playAudio(wxMouseEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 
 private:
-	uint32_t width;
 	uint64_t lowerTimestamp;
 	SDL_AudioDeviceID audioDevice;
 	AudioDataIterator audioData;

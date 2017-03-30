@@ -12,16 +12,7 @@ AudioBlockControl::AudioBlockControl(wxWindow* parent, SDL_AudioDeviceID audioDe
 	, lowerTimestamp(timestamp)
 	, audioDevice(audioDevice_)
 	, audioData(rawData)
-{
-	updateWidth();
-	SetMinSize(wxSize(width, controlHeight));
-}
-
-void AudioBlockControl::updateWidth()
-{
-	width = audioData->second.size() / (AUDIO_RATE / 10);
-	SetMinSize(wxSize(width, controlHeight));
-}
+{}
 
 uint64_t AudioBlockControl::getLowerTimestamp(void)
 {
@@ -30,7 +21,7 @@ uint64_t AudioBlockControl::getLowerTimestamp(void)
 
 uint64_t AudioBlockControl::getUpperTimestamp(void)
 {
-	return getLowerTimestamp() + (audioData->second.size() * 1000 / AUDIO_RATE);
+	return getLowerTimestamp() + ((audioData->second.size() / AUDIO_RATE) * 1000 / 4);//we have four bytes per sample
 }	
 
 void AudioBlockControl::paintEvent(wxPaintEvent & evt)
@@ -48,7 +39,9 @@ void AudioBlockControl::paintNow()
 void AudioBlockControl::render(wxDC& dc)
 {
 	dc.SetBrush(*wxBLUE_BRUSH);
-	dc.DrawRectangle(0, 0, width, controlHeight);
+	int width, height;
+	GetSize(&width, &height);	
+	dc.DrawRectangle(0, 0, width, height);
 }
 
 void AudioBlockControl::playAudio(wxMouseEvent& event)
