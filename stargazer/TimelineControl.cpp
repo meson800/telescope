@@ -77,7 +77,7 @@ void TimelineControl::render(wxDC& dc)
 		for (int i = 0; i < 15; ++i)
 		{
 			int x = static_cast<int>((currentLabel + (1000 * i) - lowerTimestamp) * millisToPixels);
-			int height = (i == 0) ? 10 : 5;
+			int height = (i == 0) ? 10 : ( (i % 5 == 0) ? 7 : 5);
 			if (x > 0)
 			{
 				dc.DrawLine(x, 25, x, 25 - height);
