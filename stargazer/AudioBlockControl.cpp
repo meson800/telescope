@@ -14,12 +14,12 @@ AudioBlockControl::AudioBlockControl(wxWindow* parent, SDL_AudioDeviceID audioDe
 	, audioData(rawData)
 {}
 
-uint64_t AudioBlockControl::getLowerTimestamp(void)
+uint64_t AudioBlockControl::getLowerTimestamp(void) const
 {
 	return lowerTimestamp;
 }
 
-uint64_t AudioBlockControl::getUpperTimestamp(void)
+uint64_t AudioBlockControl::getUpperTimestamp(void) const
 {
 	return getLowerTimestamp() + ((audioData->second.size() / AUDIO_RATE) * 1000 / 4);//we have four bytes per sample
 }	

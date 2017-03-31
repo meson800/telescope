@@ -17,8 +17,8 @@ public:
 	void paintEvent(wxPaintEvent & evt);
 	void paintNow();
 
-	uint64_t getLowerTimestamp(void);
-	uint64_t getUpperTimestamp(void);
+	uint64_t getLowerTimestamp(void) const;
+	uint64_t getUpperTimestamp(void) const;
 
 	void render(wxDC& dc);
 	void playAudio(wxMouseEvent& event);

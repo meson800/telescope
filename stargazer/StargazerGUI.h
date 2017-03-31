@@ -18,6 +18,7 @@
 class AudioBlockControl;
 class FrequencyControl;
 class TimelineControl;
+class MinimapControl;
 
 class MainFrame : public wxFrame, public NoiseAPI::NoiseCallbacks
 {
@@ -87,6 +88,9 @@ private:
 
 	//variable for the timeline control
 	TimelineControl * timeline;
+	
+	//variable for the minimap control
+	MinimapControl * minimap;
 
 	wxMenu *fileMenu;
 	wxMenu *helpMenu;

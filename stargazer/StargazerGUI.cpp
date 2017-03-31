@@ -12,6 +12,7 @@
 #include "AudioBlockControl.h"
 #include "FrequencyControl.h"
 #include "TimelineControl.h"
+#include "MinimapControl.h"
 
 #include "TelescopeGlobals.h"
 
@@ -73,7 +74,14 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	//init the connection frame
 	connectionSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	mainSizer->Add(connectionSizer, wxSizerFlags(0).Right());
+	//init the minimap
+	wxBoxSizer* topBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+	minimap = new MinimapControl(mainPanel, recievedAudioControls, 0, 0, 0, 1000);
+	minimap->Hide();
+	topBoxSizer->Add(minimap, wxSizerFlags(1).Left().Expand()); 
+	topBoxSizer->Add(connectionSizer, wxSizerFlags(0).Right());
+
+	mainSizer->Add(topBoxSizer, wxSizerFlags(0).Left().Expand());
 
 	//init the timeline
 	wxBoxSizer * timelineSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -264,6 +272,7 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 	highestTimestamp = (recievedAudioControls[freq])[millis_since_epoch]->getUpperTimestamp();
 	currentUpperTimestamp = highestTimestamp;
 	currentLowerTimestamp = currentUpperTimestamp - 1000 * 60;
+
 	UpdateDataPanel();
 	UpdateScrollbar();
 	
@@ -278,6 +287,7 @@ void MainFrame::UpdateDataPanel(void)
 		it.second->setTimestampBounds(currentLowerTimestamp, currentUpperTimestamp);
 	}
 	timeline->updateTimestamps(currentLowerTimestamp, currentUpperTimestamp);
+	minimap->updateTimestamps(lowestTimestamp, currentLowerTimestamp, currentUpperTimestamp, highestTimestamp);
 }
 
 void MainFrame::UpdateScrollbar(void)
@@ -286,6 +296,8 @@ void MainFrame::UpdateScrollbar(void)
 		|| currentUpperTimestamp < highestTimestamp)
 	{
 		dataScroll->Show();
+		minimap->Show();
+		mainSizer->Layout();
 		//now calculate where the scrollbar should go
 		dataScroll->SetScrollbar(currentLowerTimestamp - lowestTimestamp,
 			currentUpperTimestamp - currentLowerTimestamp,
@@ -293,6 +305,7 @@ void MainFrame::UpdateScrollbar(void)
 			currentUpperTimestamp - currentLowerTimestamp);
 	} else {
 		dataScroll->Hide();
+		minimap->Hide();
 	}
 }
 
