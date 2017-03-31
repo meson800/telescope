@@ -45,7 +45,6 @@ void MinimapControl::render(wxDC& dc)
 	dc.Clear();
 	int width, height;
 	GetSize(&width, &height);
-	std::cout << "Drawing minimap with width " << width << " and height " << height << "\n";
 	
 	double timestampToPixels = static_cast<double>(width) / static_cast<double>(highestTimestamp - lowestTimestamp);
 	
@@ -72,10 +71,8 @@ void MinimapControl::render(wxDC& dc)
 	if (lowerTimestamp > lowestTimestamp
 		|| upperTimestamp < highestTimestamp)
 	{
-		std::cout << "Timestamps: " << lowestTimestamp << ", " << lowerTimestamp << ", " << upperTimestamp << ", " << highestTimestamp << "\n";
 		int lowerX = static_cast<int>((lowerTimestamp - lowestTimestamp) * timestampToPixels);
 		int upperX = static_cast<int>((upperTimestamp - lowestTimestamp) * timestampToPixels);
-		std::cout << "Lower x: " << lowerX << " upper x: " << upperX << "\n";
 		
 		if (upperX >= width)
 		{
