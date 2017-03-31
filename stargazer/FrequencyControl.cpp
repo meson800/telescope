@@ -38,6 +38,8 @@ FrequencyControl::FrequencyControl(wxPanel * parent, uint32_t freq_)
 	blockPanel = new wxPanel(this, wxID_ANY);
 	sizer->Add(blockPanel, wxSizerFlags(1).Expand());
 	sizer->Layout();
+	
+	SetMinSize(wxSize(-1, 100));
 }
 
 void FrequencyControl::addAudioBlock(AudioBlockControl * control, uint64_t timestamp)

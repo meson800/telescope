@@ -8,7 +8,7 @@
 
 class AudioBlockControl : public wxWindow
 {
-	static const int controlHeight = 50;
+	static const int controlHeight = 100;
 
 	using AudioDataIterator = std::map<uint64_t, std::vector<unsigned char>>::iterator;
 public:
@@ -26,7 +26,12 @@ public:
 	wxDECLARE_EVENT_TABLE();
 
 private:
+	void updateWaveform(void);
+
 	uint64_t lowerTimestamp;
 	SDL_AudioDeviceID audioDevice;
 	AudioDataIterator audioData;
+
+	std::vector<int> waveform;
+	wxSize oldSize;
 };
