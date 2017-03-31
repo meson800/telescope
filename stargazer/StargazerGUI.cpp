@@ -81,6 +81,13 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	dataSizer->AddGrowableCol(0);
 	dataPanel->SetSizer(dataSizer);
 	mainSizer->Add(dataPanel, wxSizerFlags(1).Left().Right().Expand().Border(wxTOP, 10));
+	//set up the scrollbar
+	wxBoxSizer* scrollbarSizer = new wxBoxSizer(wxHORIZONTAL);
+	scrollbarSizer->Add(new wxPanel(mainPanel, wxID_ANY, wxDefaultPosition, wxSize(120, 10)), wxSizerFlags(0).Left());
+	
+	dataScroll = new wxScrollBar(mainPanel, wxID_ANY);
+	scrollbarSizer->Add(dataScroll, wxSizerFlags(1).Left().Right().Bottom().Expand());
+	mainSizer->Add(scrollbarSizer, wxSizerFlags(0).Left().Right().Bottom().Expand());
 }
 
 MainFrame::~MainFrame()

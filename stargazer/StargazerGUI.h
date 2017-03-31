@@ -63,6 +63,8 @@ private:
 	wxFlexGridSizer* dataSizer;
 	//Each frequency gets its own sizer
 	std::map<uint32_t, FrequencyControl *> frequencyControls;
+	//scrollbar to show this
+	wxScrollBar* dataScroll;
 
 	//map that stores audio blocks recieved
 	//the first key is frequency, the second is (raw) timestamp
