@@ -11,6 +11,7 @@
 
 #include "AudioBlockControl.h"
 #include "FrequencyControl.h"
+#include "TimelineControl.h"
 
 #include "TelescopeGlobals.h"
 
@@ -74,13 +75,23 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	mainSizer->Add(connectionSizer, wxSizerFlags(0).Right());
 
+	//init the timeline
+	wxBoxSizer * timelineSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxPanel * timelineSpacer = new wxPanel(mainPanel, wxID_ANY, wxDefaultPosition, wxSize(125, 25));
+	timelineSizer->Add(timelineSpacer, wxSizerFlags(0).Left().Border(wxALL, 0));
+
+	timeline = new TimelineControl(mainPanel, 0, 3000);
+	timeline->Hide();
+	timelineSizer->Add(timeline, wxSizerFlags(1).Right().Expand().Border(wxALL, 0));
+	mainSizer->Add(timelineSizer, wxSizerFlags(0).Left().Right().Bottom().Expand());
+
 	//init the data frame
 	dataPanel = new wxPanel(mainPanel, wxID_ANY);
 	dataPanel->SetBackgroundColour(wxColour(142, 142, 142));
 	dataSizer = new wxFlexGridSizer(1);
 	dataSizer->AddGrowableCol(0);
 	dataPanel->SetSizer(dataSizer);
-	mainSizer->Add(dataPanel, wxSizerFlags(1).Left().Right().Expand().Border(wxTOP, 10));
+	mainSizer->Add(dataPanel, wxSizerFlags(1).Left().Right().Expand().Border(wxTOP, 0));
 	//set up the scrollbar
 	scrollbarSizer = new wxBoxSizer(wxHORIZONTAL);
 	scrollbarSizer->Add(new wxPanel(mainPanel, wxID_ANY, wxDefaultPosition, wxSize(125, 10)), wxSizerFlags(0).Left());
@@ -248,10 +259,11 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 	{
 		firstEventSeen = true;
 		lowestTimestamp = millis_since_epoch;
+		timeline->Show();
 	}
 	highestTimestamp = (recievedAudioControls[freq])[millis_since_epoch]->getUpperTimestamp();
-	currentLowerTimestamp = millis_since_epoch;
 	currentUpperTimestamp = highestTimestamp;
+	currentLowerTimestamp = currentUpperTimestamp - 1000 * 60;
 	UpdateDataPanel();
 	UpdateScrollbar();
 	
@@ -265,6 +277,7 @@ void MainFrame::UpdateDataPanel(void)
 	{
 		it.second->setTimestampBounds(currentLowerTimestamp, currentUpperTimestamp);
 	}
+	timeline->updateTimestamps(currentLowerTimestamp, currentUpperTimestamp);
 }
 
 void MainFrame::UpdateScrollbar(void)
@@ -285,7 +298,6 @@ void MainFrame::UpdateScrollbar(void)
 
 void MainFrame::OnScroll(wxScrollEvent& event)
 {
-	std::cout << "Got a scroll event\n";
 	currentLowerTimestamp = lowestTimestamp + dataScroll->GetThumbPosition();
 	currentUpperTimestamp = currentLowerTimestamp + dataScroll->GetThumbSize();
 	UpdateDataPanel();

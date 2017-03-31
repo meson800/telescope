@@ -17,6 +17,7 @@
 
 class AudioBlockControl;
 class FrequencyControl;
+class TimelineControl;
 
 class MainFrame : public wxFrame, public NoiseAPI::NoiseCallbacks
 {
@@ -83,6 +84,9 @@ private:
 	uint64_t currentLowerTimestamp;
 	uint64_t currentUpperTimestamp;
 	bool firstEventSeen;
+
+	//variable for the timeline control
+	TimelineControl * timeline;
 
 	wxMenu *fileMenu;
 	wxMenu *helpMenu;
