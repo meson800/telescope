@@ -42,6 +42,9 @@ private:
 	void OnMessageEvent(MessageEvent& event);
 	void OnScroll(wxScrollEvent& event);
 
+	void OnLiveCheckbox(wxCommandEvent& event);
+	void OnAutoscrollCheckbox(wxCommandEvent& event);
+
 	void UpdateDataPanel(void);
 	void UpdateScrollbar(void);
 
@@ -91,6 +94,17 @@ private:
 	
 	//variable for the minimap control
 	MinimapControl * minimap;
+
+	//checkboxes for settings
+	wxCheckBox * liveCheckbox;
+	wxCheckBox * autoscrollCheckbox;
+	bool isLiveFeed;
+	bool isAutoscroll;
+	
+	enum ids
+	{	LiveCheckboxID = 172,
+		AutoscrollCheckboxID
+	};
 
 	wxMenu *fileMenu;
 	wxMenu *helpMenu;

@@ -39,6 +39,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	: wxFrame(NULL, wxID_ANY, title, pos, size)
 	, hasStartedNoise(false)
 	, firstEventSeen(false)
+	, isLiveFeed(true)
+	, isAutoscroll(true)
 {
 	SDL_zero(wantedSpec);
 	wantedSpec.freq = AUDIO_RATE;
@@ -78,7 +80,19 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	wxBoxSizer* topBoxSizer = new wxBoxSizer(wxHORIZONTAL);
 	minimap = new MinimapControl(mainPanel, recievedAudioControls, 0, 0, 0, 1000);
 	minimap->Hide();
-	topBoxSizer->Add(minimap, wxSizerFlags(1).Left().Expand()); 
+	topBoxSizer->Add(minimap, wxSizerFlags(1).Left().Expand().ReserveSpaceEvenIfHidden()); 
+
+	//init the settings checkboxes
+	liveCheckbox = new wxCheckBox(mainPanel, LiveCheckboxID, "Live Feed");
+	autoscrollCheckbox = new wxCheckBox(mainPanel, AutoscrollCheckboxID, "Auto-scroll");
+	wxBoxSizer* settingsSizer = new wxBoxSizer(wxVERTICAL);
+	liveCheckbox->SetValue(isLiveFeed);
+	autoscrollCheckbox->SetValue(isAutoscroll);
+	
+	settingsSizer->Add(liveCheckbox, wxSizerFlags(0).Top());
+	settingsSizer->Add(autoscrollCheckbox, wxSizerFlags(0).Bottom());
+	topBoxSizer->Add(settingsSizer, wxSizerFlags(0).Right().Centre().Border(wxLEFT, 10).Border(wxRIGHT, 5));
+
 	topBoxSizer->Add(connectionSizer, wxSizerFlags(0).Right());
 
 	mainSizer->Add(topBoxSizer, wxSizerFlags(0).Left().Expand());
@@ -270,14 +284,21 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 		timeline->Show();
 	}
 	highestTimestamp = (recievedAudioControls[freq])[millis_since_epoch]->getUpperTimestamp();
-	currentUpperTimestamp = highestTimestamp;
-	currentLowerTimestamp = currentUpperTimestamp - 1000 * 60;
+	
+	if (isAutoscroll)
+	{
+		currentUpperTimestamp = highestTimestamp;
+		currentLowerTimestamp = currentUpperTimestamp - 1000 * 60;
+	}
 
 	UpdateDataPanel();
 	UpdateScrollbar();
 	
 	//and play the audio itself!
-	SDL_QueueAudio(audioDevice, audio_data.data(), audio_data.size());
+	if (isLiveFeed)
+	{
+		SDL_QueueAudio(audioDevice, audio_data.data(), audio_data.size());
+	}
 }
 
 void MainFrame::UpdateDataPanel(void)
@@ -307,6 +328,16 @@ void MainFrame::UpdateScrollbar(void)
 		dataScroll->Hide();
 		minimap->Hide();
 	}
+}
+
+void MainFrame::OnLiveCheckbox(wxCommandEvent& event)
+{
+	isLiveFeed = liveCheckbox->IsChecked();
+}
+
+void MainFrame::OnAutoscrollCheckbox(wxCommandEvent& event)
+{
+	isAutoscroll = autoscrollCheckbox->IsChecked();
 }
 
 void MainFrame::OnScroll(wxScrollEvent& event)
@@ -348,4 +379,6 @@ wxBEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_NOISE_CONNECTION(wxID_ANY, MainFrame::OnConnectionEvent)
 	EVT_NOISE_FINGERPRINT(wxID_ANY, MainFrame::OnFingerprintEvent)
 	EVT_NOISE_MESSAGE(wxID_ANY, MainFrame::OnMessageEvent)
+	EVT_CHECKBOX(LiveCheckboxID, MainFrame::OnLiveCheckbox)
+	EVT_CHECKBOX(AutoscrollCheckboxID, MainFrame::OnAutoscrollCheckbox)
 wxEND_EVENT_TABLE()
