@@ -82,14 +82,15 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	dataPanel->SetSizer(dataSizer);
 	mainSizer->Add(dataPanel, wxSizerFlags(1).Left().Right().Expand().Border(wxTOP, 10));
 	//set up the scrollbar
-	wxBoxSizer* scrollbarSizer = new wxBoxSizer(wxHORIZONTAL);
-	scrollbarSizer->Add(new wxPanel(mainPanel, wxID_ANY, wxDefaultPosition, wxSize(120, 10)), wxSizerFlags(0).Left());
+	scrollbarSizer = new wxBoxSizer(wxHORIZONTAL);
+	scrollbarSizer->Add(new wxPanel(mainPanel, wxID_ANY, wxDefaultPosition, wxSize(125, 10)), wxSizerFlags(0).Left());
 	
 	dataScroll = new wxScrollBar(mainPanel, wxID_ANY);
 	scrollbarSizer->Add(dataScroll, wxSizerFlags(1).Left().Right().Bottom().Expand());
 	mainSizer->Add(scrollbarSizer, wxSizerFlags(0).Left().Right().Bottom().Expand());
 	
-	dataScroll->SetScrollbar(5, 5, 15, 5);
+	dataScroll->Hide();	
+	
 	dataScroll->Bind(wxEVT_SCROLL_TOP, &MainFrame::OnScroll, this);
 	dataScroll->Bind(wxEVT_SCROLL_BOTTOM, &MainFrame::OnScroll, this);
 	dataScroll->Bind(wxEVT_SCROLL_LINEUP, &MainFrame::OnScroll, this);
@@ -249,18 +250,45 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 		lowestTimestamp = millis_since_epoch;
 	}
 	highestTimestamp = (recievedAudioControls[freq])[millis_since_epoch]->getUpperTimestamp();
-	for (auto it : frequencyControls)
-	{
-		it.second->setTimestampBounds(lowestTimestamp, highestTimestamp);
-	}
+	currentLowerTimestamp = millis_since_epoch;
+	currentUpperTimestamp = highestTimestamp;
+	UpdateDataPanel();
+	UpdateScrollbar();
 	
 	//and play the audio itself!
 	SDL_QueueAudio(audioDevice, audio_data.data(), audio_data.size());
 }
 
+void MainFrame::UpdateDataPanel(void)
+{
+	for (auto it : frequencyControls)
+	{
+		it.second->setTimestampBounds(currentLowerTimestamp, currentUpperTimestamp);
+	}
+}
+
+void MainFrame::UpdateScrollbar(void)
+{
+	if (currentLowerTimestamp > lowestTimestamp
+		|| currentUpperTimestamp < highestTimestamp)
+	{
+		dataScroll->Show();
+		//now calculate where the scrollbar should go
+		dataScroll->SetScrollbar(currentLowerTimestamp - lowestTimestamp,
+			currentUpperTimestamp - currentLowerTimestamp,
+			highestTimestamp - lowestTimestamp,
+			currentUpperTimestamp - currentLowerTimestamp);
+	} else {
+		dataScroll->Hide();
+	}
+}
+
 void MainFrame::OnScroll(wxScrollEvent& event)
 {
 	std::cout << "Got a scroll event\n";
+	currentLowerTimestamp = lowestTimestamp + dataScroll->GetThumbPosition();
+	currentUpperTimestamp = currentLowerTimestamp + dataScroll->GetThumbSize();
+	UpdateDataPanel();
 }
 
 void MainFrame::MessageRecieved(const Message& message)

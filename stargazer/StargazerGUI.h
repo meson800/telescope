@@ -40,6 +40,9 @@ private:
 	void OnMessageEvent(MessageEvent& event);
 	void OnScroll(wxScrollEvent& event);
 
+	void UpdateDataPanel(void);
+	void UpdateScrollbar(void);
+
 	void StartNoise();
 
 	//sdl variables
@@ -65,6 +68,7 @@ private:
 	//Each frequency gets its own sizer
 	std::map<uint32_t, FrequencyControl *> frequencyControls;
 	//scrollbar to show this
+	wxBoxSizer* scrollbarSizer;
 	wxScrollBar* dataScroll;
 
 	//map that stores audio blocks recieved
@@ -75,6 +79,9 @@ private:
 	//store the current lowest and largest timestamp values
 	uint64_t lowestTimestamp;
 	uint64_t highestTimestamp;
+	
+	uint64_t currentLowerTimestamp;
+	uint64_t currentUpperTimestamp;
 	bool firstEventSeen;
 
 	wxMenu *fileMenu;
