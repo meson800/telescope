@@ -88,6 +88,17 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	dataScroll = new wxScrollBar(mainPanel, wxID_ANY);
 	scrollbarSizer->Add(dataScroll, wxSizerFlags(1).Left().Right().Bottom().Expand());
 	mainSizer->Add(scrollbarSizer, wxSizerFlags(0).Left().Right().Bottom().Expand());
+	
+	dataScroll->SetScrollbar(5, 5, 15, 5);
+	dataScroll->Bind(wxEVT_SCROLL_TOP, &MainFrame::OnScroll, this);
+	dataScroll->Bind(wxEVT_SCROLL_BOTTOM, &MainFrame::OnScroll, this);
+	dataScroll->Bind(wxEVT_SCROLL_LINEUP, &MainFrame::OnScroll, this);
+	dataScroll->Bind(wxEVT_SCROLL_LINEDOWN, &MainFrame::OnScroll, this);
+	dataScroll->Bind(wxEVT_SCROLL_PAGEUP, &MainFrame::OnScroll, this);
+	dataScroll->Bind(wxEVT_SCROLL_PAGEDOWN, &MainFrame::OnScroll, this);
+	dataScroll->Bind(wxEVT_SCROLL_THUMBTRACK, &MainFrame::OnScroll, this);
+	dataScroll->Bind(wxEVT_SCROLL_THUMBRELEASE, &MainFrame::OnScroll, this);
+	dataScroll->Bind(wxEVT_SCROLL_CHANGED, &MainFrame::OnScroll, this);
 }
 
 MainFrame::~MainFrame()
@@ -245,6 +256,11 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 	
 	//and play the audio itself!
 	SDL_QueueAudio(audioDevice, audio_data.data(), audio_data.size());
+}
+
+void MainFrame::OnScroll(wxScrollEvent& event)
+{
+	std::cout << "Got a scroll event\n";
 }
 
 void MainFrame::MessageRecieved(const Message& message)

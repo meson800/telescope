@@ -38,6 +38,7 @@ private:
 	void OnConnectionEvent(ConnectionEvent& event);
 	void OnFingerprintEvent(FingerprintEvent& event);
 	void OnMessageEvent(MessageEvent& event);
+	void OnScroll(wxScrollEvent& event);
 
 	void StartNoise();
 
