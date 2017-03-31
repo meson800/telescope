@@ -23,6 +23,9 @@ public:
 
 	//the panel on which we place audio events
 	wxPanel * blockPanel;
+	
+	//function to capture size events
+	void OnResize(wxSizeEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 

@@ -8,6 +8,7 @@
 #include <wx/statline.h>
 
 wxBEGIN_EVENT_TABLE(FrequencyControl, wxPanel)
+	EVT_SIZE(FrequencyControl::OnResize)
 wxEND_EVENT_TABLE()
 
 FrequencyControl::FrequencyControl(wxPanel * parent, uint32_t freq_)
@@ -42,8 +43,6 @@ FrequencyControl::FrequencyControl(wxPanel * parent, uint32_t freq_)
 void FrequencyControl::addAudioBlock(AudioBlockControl * control, uint64_t timestamp)
 {
 	audioBlockControls.push_back(control);
-	//sizer->Add(control, wxSizerFlags(0).Left().Border(wxALL, 10));
-	//sizer->Layout();	
 	update();
 }
 
@@ -52,6 +51,14 @@ void FrequencyControl::setTimestampBounds(uint64_t lower, uint64_t upper)
 	lowerTimestamp = lower;
 	upperTimestamp = upper;
 	update();
+}
+
+void FrequencyControl::OnResize(wxSizeEvent& event)
+{
+	sizer->Layout();
+	update();
+	Refresh();
+	event.Skip();
 }
 
 void FrequencyControl::update(void)
