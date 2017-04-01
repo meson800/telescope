@@ -50,12 +50,12 @@ void MinimapControl::render(wxDC& dc)
 	
 
 	//loop over each audio block, and draw it accordingly.
-	dc.SetBrush(*wxBLUE_BRUSH);
 	dc.SetPen(*wxTRANSPARENT_PEN);
 	for (auto mapIterator : audioBlocks)
 	{
 		for (auto blockIt : mapIterator.second)
 		{
+			dc.SetBrush(blockIt.second->hasBeenPlayed() ? *wxBLUE_BRUSH : *wxGREEN_BRUSH);
 			if (blockIt.second->getUpperTimestamp() - blockIt.second->getLowerTimestamp() > 50)
 			{
 				dc.DrawRectangle(

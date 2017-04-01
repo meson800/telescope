@@ -263,7 +263,7 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 			dataSizer->Layout();
 		}
 
-		AudioBlockControl * newControl = new AudioBlockControl(frequencyControls[freq]->blockPanel, audioDevice,
+		AudioBlockControl * newControl = new AudioBlockControl(frequencyControls[freq]->blockPanel, minimap, audioDevice,
 			recievedAudio[freq].find(millis_since_epoch), millis_since_epoch);
 		(recievedAudioControls[freq])[millis_since_epoch] = newControl;
 		frequencyControls[freq]->addAudioBlock(newControl, millis_since_epoch);
@@ -298,6 +298,8 @@ void MainFrame::OnMessageEvent(MessageEvent & event)
 	if (isLiveFeed)
 	{
 		SDL_QueueAudio(audioDevice, audio_data.data(), audio_data.size());
+		(recievedAudioControls[freq])[millis_since_epoch]->setPlayed();
+		minimap->Refresh();
 	}
 }
 

@@ -9,11 +9,13 @@ wxBEGIN_EVENT_TABLE(AudioBlockControl, wxWindow)
 	EVT_LEFT_UP(AudioBlockControl::playAudio)
 wxEND_EVENT_TABLE()
 
-AudioBlockControl::AudioBlockControl(wxWindow* parent, SDL_AudioDeviceID audioDevice_, AudioDataIterator rawData, uint64_t timestamp)
+AudioBlockControl::AudioBlockControl(wxWindow* parent, wxWindow * redraw, SDL_AudioDeviceID audioDevice_, AudioDataIterator rawData, uint64_t timestamp)
 	: wxWindow(parent, wxID_ANY)
+	, redrawWindow(redraw)
 	, lowerTimestamp(timestamp)
 	, audioDevice(audioDevice_)
 	, audioData(rawData)
+	, playStatus(false)
 {
 	SetMinSize(wxSize(-1, controlHeight));
 }
@@ -27,6 +29,21 @@ uint64_t AudioBlockControl::getUpperTimestamp(void) const
 {
 	return getLowerTimestamp() + ((audioData->second.size() / AUDIO_RATE) * 1000 / 4);//we have four bytes per sample
 }	
+
+bool AudioBlockControl::hasBeenPlayed(void) const
+{
+	return playStatus;
+}
+
+void AudioBlockControl::setPlayed(void)
+{
+	if (!playStatus)
+	{
+		playStatus = true;
+		Refresh();
+		redrawWindow->Refresh();
+	}
+}
 
 void AudioBlockControl::paintEvent(wxPaintEvent & evt)
 {
@@ -81,7 +98,7 @@ void AudioBlockControl::render(wxDC& dc)
 		oldSize = GetSize();
 	}
 	dc.SetBrush(wxBrush(wxColour(192, 192, 192)));
-	dc.SetPen(*wxTRANSPARENT_PEN);
+	dc.SetPen(hasBeenPlayed() ? *wxTRANSPARENT_PEN : *wxGREEN_PEN);
 	dc.DrawRectangle(0, 0, width, height);
 
 	dc.SetPen(wxPen(wxColour(100, 100, 220)));
@@ -94,4 +111,5 @@ void AudioBlockControl::render(wxDC& dc)
 void AudioBlockControl::playAudio(wxMouseEvent& event)
 {
 	SDL_QueueAudio(audioDevice, audioData->second.data(), audioData->second.size());
+	setPlayed();
 }	
